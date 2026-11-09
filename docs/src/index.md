@@ -3,6 +3,15 @@ This package provides sampling methods for commonly used quantum states in vario
 
 It also provides helpers for sampling complex and real noises used in phase-space simulations, including SDE workflows with [DifferentialEquations.jl](https://github.com/JuliaDiffEq/DifferentialEquations.jl).
 
+## Start with a cat
+
+Sample a coherent superposition of components centred at +α and −α. Even and
+odd cats retain different interference, while a classical mixture averages the
+two component densities. The [cat-state tutorial](@ref cat-q-tutorial) explains
+the comparison, provides seeded code, and checks moments and acceptance.
+
+![Even-cat, odd-cat and classical-mixture Q samples at alpha=1.2, with exact-density contours.](assets/cat-q.png)
+
 # Installation
 In the julia REPL
 

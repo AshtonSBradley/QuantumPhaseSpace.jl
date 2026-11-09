@@ -30,6 +30,15 @@ Thermal
 Bogoliubov
 ```
 
+## Cats and coherent superpositions
+
+[`EvenCat`](@ref), [`OddCat`](@ref) and [`Cat`](@ref) combine coherent components at
+±α with a chosen relative phase. A [`Mixture`](@ref) of those components is a
+different density matrix. Follow the [Q sampling tutorial](@ref cat-q-tutorial)
+for figures, runnable code and moment checks; the
+[finite-superposition machinery](exact-sampling.md) also covers sparse Fock
+states, NOON states and photon-added coherent states.
+
 ## Exact Q compositions and thermal operations
 
 Displacement and rotation act on Q coordinates as `z+β` and `exp(iθ)z`.

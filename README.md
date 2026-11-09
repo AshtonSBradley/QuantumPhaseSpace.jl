@@ -8,11 +8,14 @@
 
 Sample quantum initial states commonly encountered in quantum phase space simulations of Bose fields, including those encountered in quantum optics and Bose-Einstein condensates. 
 
-Wigner and positive-P distributions are available, being the most useful for dynamical simulations.
+Exact Husimi-Q and positive-P sampling includes cats, finite quantum superpositions, photon-added states and multimode initial conditions. Ordinary Wigner sampling is available for the states listed in the support table.
 
 Available distributions are `glauberP`, `positiveP`, `wigner`, `positiveW`, and `husimiQ`.
 
-<img src="examples/fock.png" alt="Fock state Wigner function" width="300"/>
+[![Even-cat, odd-cat and classical-mixture Husimi-Q samples, with coherent centres at plus and minus alpha.](docs/src/assets/cat-q.png)](docs/src/cat-q.md)
+
+Even and odd cats preserve different interference between the same coherent
+components at ±α. [Explore the cat-state Q tutorial](docs/src/cat-q.md).
 
 ## Install
 
@@ -23,20 +26,19 @@ julia> ]add PhaseSpaceTools
 ## Quick Start
 
 ```julia
-julia> using PhaseSpaceTools
+using PhaseSpaceTools, Random
 
-julia> α = 1.0 + 2.0im
-julia> state = Coherent(α)
-julia> samples, samples_conj = positiveP(state, 4)
-
-julia> mean(samples)
-1.0 + 2.0im
-
-julia> real(mean(samples_conj .* samples))
-5.0
+rng = MersenneTwister(42)
+α = 1.2 + 0im
+state = EvenCat(α)                  # |α⟩ + |−α⟩, normalised
+z, zbar = husimiQ(rng, state, 100_000)
 ```
 
-For coherent states, the `+P` representation is deterministic: `samples` and `samples_conj` are fixed at `α` and `conj(α)`.
+`z` contains Q phase-plane samples and `zbar == conj.(z)`. Use `OddCat(α)` for
+the relative minus sign. The classical mixture is
+`Mixture((Coherent(α),Coherent(-α)),[0.5,0.5])`. The
+[tutorial](docs/src/cat-q.md) compares all three distributions and explains
+`sampleQ(...; diagnostics=true)`, ordering corrections and preparation loss.
 
 ## Core states
 

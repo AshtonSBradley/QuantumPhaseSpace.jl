@@ -55,6 +55,9 @@ and collective-orbital samplers introduce no Hilbert-space cutoff.
 
 ## Examples
 
+Start with the [cat-state Q tutorial](@ref cat-q-tutorial) for a visual comparison
+of even and odd cats with the classical mixture of ±α.
+
 The executable `examples/exact_sampling.jl` demonstrates a cat, photon-added
 thermal and coherent states, NOON, a complex fixed-N condensate, a lossy cat,
 phase-diffused squeezing and photon-added squeezing. It also runs the helper

@@ -146,3 +146,17 @@ branch has separate commits for stages 0–6 and positive-W. Known limits:
   support and automatic differentiation are deferred/optional as directed.
 - Initial estimator variance does not establish dynamical positive-P stability.
 - Local tests passed; GitHub-hosted CI was configured but not triggered here.
+
+
+## Cat-Q documentation showcase (complete, 10 November 2026)
+
+Added a visual cat-state tutorial ahead of the derivations, with exact Q sample
+histograms for even/odd cats and the equal classical mixture of ±α. A second
+comparison rotates α by π/6. The README and documentation navigation now lead
+to the tutorial; examples cover diagnostics, Q ordering, relative phase, loss
+and small odd cats. The independent CairoMakie generator and PNG/PDF/TSV assets
+are committed. All six 300,000-sample panels pass moment, normalisation, central
+probability and acceptance checks; observed occupation/central errors are below
+2.2 standard errors. Clean Documenter build, 7 executable tutorial blocks,
+and package doctests pass. Standalone figures and the main rendered page were
+visually checked. Details: CAT_Q_DOCS.md. Core samplers remain unchanged.

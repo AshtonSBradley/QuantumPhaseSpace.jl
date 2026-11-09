@@ -1,5 +1,9 @@
 # Exact Q sampling and quantum superpositions
 
+Start with the [cat-state Q tutorial](@ref cat-q-tutorial) for runnable examples
+and sampled even/odd/mixture comparisons. This page develops the rejection
+bounds, overlap conventions and extensions behind those examples.
+
 ## Pure overlaps and coherent sums
 
 `Superposition(states,c)` forms a coherent sum, not a mixture. All components
@@ -37,7 +41,7 @@ Displacement retains the phase
 `(β conj(z)-conj(β)z)/2` in `logoverlap`. Omitting it changes a subsequent
 superposition, even though it leaves an individual Q density unchanged.
 
-## Cats, including the small odd-cat limit
+## [Cats, including the small odd-cat limit](@id small-odd-cat)
 
 `Cat(α,φ)`, `EvenCat(α)` and `OddCat(α)` use the two coherent components
 analytically, without truncation. Their direct two-Gaussian proposal has

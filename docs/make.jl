@@ -3,6 +3,7 @@ using Documenter, PhaseSpaceTools
 makedocs(sitename="PhaseSpaceTools.jl",
 pages = [
 "Overview" => "index.md",
+"Sampling a Schrödinger Cat" => "cat-q.md",
 "Introduction to Phase Space" => "phasespace.md",
 "Quantum States" => "states.md",
 "Distributions" => "distributions.md",
