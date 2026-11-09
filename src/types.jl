@@ -3,44 +3,11 @@
 
 Abstract supertype for all sampled states: `state <: State`.
 
-# Examples
-## Find all states that may be sampled
-
-```julia-repl
-julia> subtypes(State)
-
-7-element Vector{Any}:
-Bogoliubov
-Coherent
-Crescent
-Fock
-Squeezed
-SqueezedTwoMode
-Thermal
-```
-
-## Create and sample a particular state (vacuum)
-
-```julia-repl 
-julia> s = Fock(0)
-Fock(0)
-julia> wigner(s,100)
-┌ Warning: Fock state sampling for W is only valid for n ≫ 1.
-```
-
-Here a warning is generated since Fock sampling is not well defined for small `n`. 
-    
-A simpler way to sample the vacuum is 
-
-```julia-repl 
-julia> s = Coherent(0) 
-Coherent(0.0 + 0.0im)  # type conversion to ComplexF64.
-
-julia> wigner(s,100)
-(ComplexF64[0.33820868828162637 + 0.4407579103538181im, 0.057183146091823775 - 0.2772571883006981im, ...
-```
-generating two vectors of sampled points `α,α⁺` in the complex plane. In this case, `α = conj(α⁺)`, as we are not working with a doubled phase space.
-"""    
+Ordinary phase-plane samplers return conjugate coordinate vectors. Doubled
+positive-P and positive-W coordinates are generally correlated, and need not
+be conjugates. `wigner(Fock(0), N)` samples the exact vacuum; for `n > 0`
+the ordinary Fock W sampler is only a large-occupation approximation.
+"""
 abstract type State end
 
 """
@@ -72,7 +39,9 @@ Fock(n::Integer) = Fock(Int64(n))
 """
     Crescent(β,ϵ,q)
 
-Create a Crescent state with parameters `β`, `ϵ`, `q`.
+Phase-diffuse `Squeezed(β,ϵ)` by rotating its entire phase plane through
+`q*η`, where `η` is a standard real Gaussian. Thus `|q|` is the phase
+standard deviation; `q=0` gives the declared squeezed state.
 """
 struct Crescent <: State
     β::Complex{Float64}
@@ -85,7 +54,9 @@ Crescent(β::Number, ϵ::Number, q::Real) = Crescent(ComplexF64(β), ComplexF64(
 """
     Squeezed(β,ϵ)
 
-Create a Squeezed state with parameters `β`, `ϵ`.
+Create `D(β) S(ϵ)|0⟩`, with
+`S(ϵ) = exp((conj(ϵ)a² - ϵ a†²)/2)` and `ϵ = r exp(iθ)`.
+The centred anomalous moment is `-exp(iθ)sinh(r)cosh(r)`.
 """
 struct Squeezed <: State
     β::Complex{Float64}

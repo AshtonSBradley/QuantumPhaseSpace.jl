@@ -1,6 +1,8 @@
 #!/usr/bin/env julia
 
 using PhaseSpaceTools, Test, Statistics, Aqua, Random
+Random.seed!(0x514e)
+include("scientific.jl")
 
 function randuv()
     u,v = randnc(2)
@@ -53,12 +55,12 @@ end
     # Bogoliubov
     u = sqrt(2)
     v = 1.0
-    state = Bogoliubov(u,v,1)
+    state = Bogoliubov(u,v,4)
     @test typeof(state) <: State
-    @test typeof(state) == typeof(Bogoliubov(u,v,1))
+    @test typeof(state) == typeof(Bogoliubov(u,v,4))
     @test state.u === ComplexF64(u)
     @test state.v === ComplexF64(v)
-    @test state.n̄ === 1.0
+    @test state.n̄ === 4.0
     @test typeof(wigner(state,1)[1][1]) == Complex{Float64}
     @test typeof(glauberP(state,1)[1][1]) == Complex{Float64}
     @test typeof(husimiQ(state,1)[1][1]) == Complex{Float64}
@@ -127,7 +129,8 @@ end
 end
 
 @testset "Fock W warning" begin
-    @test_logs (:warn, r"Fock state sampling for W is only valid for n") wigner(Fock(0), 10)
+    @test_logs wigner(Fock(0), 10)
+    @test_logs (:warn, r"Fock state sampling for W is only valid for n") wigner(Fock(1), 10)
 end
 
 @testset "Noises" begin 
@@ -353,25 +356,16 @@ end
 
 end
 
-@testset "Fock +P" begin 
-
-    n = 99
-    N = 100_000
-    state = Fock(n)
-    a,ā = positiveP(state,N)
-
-    meana = mean(a)
-    absa = abs(meana)
-    n̄ = mean(a.*ā) |> real
-    Vn = abs(mean(a.*a.*ā.*ā))-abs(mean(a.*ā)).^2
-    rel_num_var = sqrt(abs(Vn))/abs(n̄);
-
-    #test
-    @test absa < 0.1
-    @test abs(n̄ - n) < 1
-    @test Vn < 50
-    @test rel_num_var < 0.15
-
+@testset "Fock +P" begin
+    n = 3
+    a, ap = positiveP(Fock(n), 200_000)
+    checkmean(ap .* a, n)
+    checkmean(ap.^2 .* a.^2, n*(n-1))
+    # Preserve the signed complex estimator and its imaginary residual.
+    n_est = mean(ap .* a)
+    variance = mean(ap.^2 .* a.^2) + n_est - n_est^2
+    @test abs(real(variance)) < 0.2
+    @test abs(imag(variance)) < 0.2
 end
 
 @testset "Squeezed +P " begin 

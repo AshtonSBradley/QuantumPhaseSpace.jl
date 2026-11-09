@@ -33,7 +33,7 @@ Generate `N` samples from the positive-P (+P) phase-space distribution for `stat
 
 Moments of the +P distribution generate quantum operator averages that are normally ordered.
 
-In general the two random variates α,α⁺ are statistically independent for the +P distribution. 
+The doubled coordinates α,α⁺ need not be conjugates and are generally correlated. 
 """
 function positiveP(state::State,N)
     μ,μ⁺ = husimiQ(state,N)
@@ -117,26 +117,22 @@ function wigner(state::Squeezed,N)
     @unpack β,ϵ = state
     r = abs(ϵ)
     ϕ = angle(ϵ)/2
-    α = β .+ 0.5*(randn(N)*exp(-r) .+ im*randn(N)*exp(r))*exp(-im*ϕ)
+    α = β .+ 0.5*(randn(N)*exp(-r) .+ im*randn(N)*exp(r))*exp(im*ϕ)
     α⁺ = conj(α)
     return α, α⁺
 end
 
 function husimiQ(state::Crescent,N)
-    @unpack β,ϵ,q = state
-    r = abs(ϵ)
-    ϕ = angle(ϵ)/2
-    α = β .+ (randn(N)*exp(-r) .+ im*randn(N)*exp(r))*exp(-im*ϕ)/sqrt(2)
-    α = α.*exp.(im*q*randn(N))
-    α⁺ = conj(α)
-    return α,α⁺
+    α, _ = wigner(state,N)
+    α .+= randnc(N)/sqrt(2)
+    return α, conj(α)
 end
 
 function wigner(state::Crescent,N)
     @unpack β,ϵ,q = state
     r = abs(ϵ)
     ϕ = angle(ϵ)/2
-    α = β .+ 0.5*(randn(N)*exp(-r) .+ im*randn(N)*exp(r))*exp(-im*ϕ)
+    α = β .+ 0.5*(randn(N)*exp(-r) .+ im*randn(N)*exp(r))*exp(im*ϕ)
     α = α.*exp.(im*q*randn(N))
     α⁺ = conj(α)
     return α, α⁺
@@ -153,6 +149,7 @@ end
 
 function wigner(state::Fock,N)
     @unpack n = state
+    n == 0 && return wigner(Coherent(0),N)
     n < 10 && @warn "Fock state sampling for W is only valid for n ≫ 1."
     p = 0.5*sqrt(2*n+1+2*sqrt(n^2+n))
     q = 1/(4*p)
@@ -195,11 +192,19 @@ end
 end
 
 function glauberP(state::Bogoliubov,N)
-    @unpack u,v,n̄ = state
-    β,β⁺ = glauberP(Thermal(0.0,n̄),N)
-    α = u*β + conj(v)*β⁺
-    α⁺ = conj.(α)
-    return α,α⁺
+    (; u,v,n̄) = state
+    occupation = (abs2(u) + abs2(v))*n̄ + abs2(v)
+    anomalous = (2n̄ + 1)*u*conj(v)
+    # Covariance of (Re α, Im α), including the transformed vacuum.
+    V = [occupation + real(anomalous) imag(anomalous);
+         imag(anomalous) occupation - real(anomalous)]/2
+    E = eigen(Symmetric(V))
+    tol = 100eps(Float64)*max(1,opnorm(V))
+    minimum(E.values) >= -tol || throw(ArgumentError(
+        "Bogoliubov state has no nonnegative ordinary Glauber P; use positiveP."))
+    x = E.vectors*Diagonal(sqrt.(max.(E.values,0)))*randn(2,N)
+    α = complex.(x[1,:],x[2,:])
+    return α, conj(α)
 end
 
 function wigner(state::Bogoliubov,N)

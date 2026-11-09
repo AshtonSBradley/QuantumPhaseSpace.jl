@@ -44,7 +44,7 @@ state = Coherent(12.0)
 ```
 In any other distribution the coherent state is more interesting to sample.
 
-Note here that $\alpha$ and $\alpha^+$ are simple complex conjugates. In any of the doubled-phase space representations such as the [Positive-P representation](@ref), they are independent variables.
+Note here that $\alpha$ and $\alpha^+$ are simple complex conjugates. In any of the doubled-phase space representations such as the [Positive-P representation](@ref), they need not be conjugates, and are generally correlated.
 
 
 ## Husimi-Q representation
@@ -56,7 +56,7 @@ Q(\alpha,\alpha^*)=\frac{1}{\pi}\langle \alpha|\rho|\alpha\rangle
 
 Many of its properties are very direct to prove. For example, moments of $Q$ generate anti-normally ordered operator averages:
 ```math
-\int d^2\alpha\;(\alpha^*)^p\alpha^qQ(\alpha,\alpha^*)=\langle a^q (a^\dag)^q\rangle
+\int d^2\alpha\;(\alpha^*)^p\alpha^qQ(\alpha,\alpha^*)=\langle a^q (a^\dag)^p\rangle
 ```
 as may be shown using properties of the trace.
 
@@ -65,7 +65,7 @@ In this code we make frequent use of the $Q$ function to sample other distributi
 In the next section we outline the main application of this relationship, which is sampling particular +P distributions for states where a $Q$ function may be easily sampled. 
 
 ## Positive-P representation
-In the Positive-P representation the simples way to sample the state is again as a point on the complex plane
+In the Positive-P representation a simple way to sample the state is again as a point on the complex plane
 
 ```julia
 α,α⁺ = positiveP(state,N)
@@ -73,7 +73,7 @@ In the Positive-P representation the simples way to sample the state is again as
 
 Here ``α,α⁺`` are no longer in general complex conjugates. Even if they are initial conjugates, we emphasize that this is no longer the case in subsequent dynamical evolution of the ensemble of phase space points. Furthermore, unlike the Glauber-P distribution, the +P distribution for a particular quantum state is not unique.
 
-In this package we primarily focus on single mode problems, taking the general approach of sampling the Husimi-Q funcion, and then exploiting a simple convolutional relationship between the Husimi-Q and a particular choice of +P representation.
+In this package we primarily focus on single mode problems, taking the general approach of sampling the Husimi-Q function, and then exploiting a simple convolutional relationship between the Husimi-Q and a particular choice of +P representation.
 
 A particular choice of +P that can be made for any single mode density matrix is given by
 ```math
@@ -115,7 +115,7 @@ Just as the phase space of the P-representation can be doubled to give the posit
 ```math
 W_+(\alpha,\alpha^+)=\frac{2}{\pi}\int d^2\lambda e^{-2|\lambda|^2}P_+(\alpha+\lambda,\alpha^++\lambda^*).
 ```
-We can make a change of variables to $\mu, \gamma$, by defining $\lambda = \mu'-(\alpha+\alpha^+)/2$, and
+We can make a change of variables to $\mu, \gamma$, by defining $\lambda = \mu'-(\alpha+(\alpha^+)^*)/2$, and
 ```math
 \alpha = \mu + \gamma,\quad\quad \alpha^+ = \mu^* - \gamma^*
 ```
@@ -125,7 +125,7 @@ with inverse
 ```
 Using the specific form of $P_+$ in terms of the $Q$ function, we have
 ```math
-W_+(\alpha,\alpha^+)=\frac{2}{\pi}\int d^2\mu' e^{-2|\mu'-(\alpha+(\alpha^+)^*)/2|^2}\frac{e^{-|\alpha-(\alpha^+)^*|^2/4}}{4\pi^2}Q(\mu',\mu'^*).
+W_+(\alpha,\alpha^+)=\frac{2}{\pi}\int d^2\mu' e^{-2|\mu'-(\alpha+(\alpha^+)^*)/2|^2}\frac{e^{-|\alpha-(\alpha^+)^*|^2/4}}{4\pi}Q(\mu',\mu'^*).
 ```
 We note that
 ```math
@@ -137,7 +137,7 @@ where the factor 4 is the Jacobian of the transformation. Hence, we define
 ```
 and we thus have a particular form for the positive-W of any single mode bosonic quantum state
 ```math
-\tilde W_+(\gamma,\mu) = \frac{e^{-|\gamma|^2}}{\pi}\frac{2}{\pi^2}\int d^2\mu' e^{-2|\mu'-\mu|^2}Q(\mu',\mu'^*)
+\tilde W_+(\gamma,\mu) = \frac{e^{-|\gamma|^2}}{\pi}\frac{2}{\pi}\int d^2\mu' e^{-2|\mu'-\mu|^2}Q(\mu',\mu'^*)
 ```
 together with the inverse given above
 ```math
