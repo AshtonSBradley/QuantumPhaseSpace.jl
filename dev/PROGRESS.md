@@ -73,3 +73,13 @@ single/two/multiple modes, cross and fourth moments and an independent binomial
 Hilbert expansion. No per-sample number rescaling is present.
 
 Validation: full Julia 1.13.3 suite passed, including 348 multimode checks.
+
+## Stage 5 (complete)
+
+Added exact Q loss and Gaussian phase diffusion, scalar/per-mode parameters,
+common versus independent phase noise, and generic positive-P inheritance.
+Validation compares lossy Fock states to binomial mixtures and lossy cats to
+independent Kraus density matrices; first/anomalous/higher phase factors and
+identity/complete-loss limits are covered.
+
+Validation: full Julia 1.13.3 suite passed, including 99 channel checks.

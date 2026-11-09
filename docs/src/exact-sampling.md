@@ -142,3 +142,23 @@ variances; benchmark them using the same observable.
 Passive
 FixedNumberCondensate
 ```
+
+## Preparation channels
+
+`Loss(state,η)` implements `z_out=√η*z_in+√(1-η)*ξ` independently per mode,
+with scalar or per-mode transmissivity and `E|ξ|²=1`. This is the exact Q
+channel, including mixed-state decoherence. Shrinking a pure cat's amplitude
+alone would omit the environment's information about its components.
+
+`PhaseDiffused(state,σ;common=true)` applies one Gaussian phase of variance σ²
+to all modes. `common=false` draws independent phases with scalar or per-mode
+standard deviations. In one mode the Q moment `(z*)^p z^q` acquires
+`exp[-(p-q)²σ²/2]`. `Crescent(β,ϵ,q)` retains its legacy signed q parameter,
+with physical standard deviation `abs(q)`, and equals phase diffusion of the
+declared squeezed state. These channels sample mixed states and do not expose
+pure-state overlaps for coherent superpositions.
+
+```@docs
+Loss
+PhaseDiffused
+```

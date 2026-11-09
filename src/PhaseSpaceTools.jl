@@ -16,6 +16,7 @@ export PhotonAddedThermal, PhotonSubtractedThermal
 export Superposition, CoherentSuperposition, Compass, FockSuperposition, NOON
 export PhotonAddedCoherent, SqueezedCat, Cat, EvenCat, OddCat
 export Passive, FixedNumberCondensate
+export Loss, PhaseDiffused
 export State, Coherent, Squeezed, SqueezedTwoMode, Fock, Thermal, Crescent, Bogoliubov
 export glauberP, husimiQ, wigner, positiveP, positiveW
 export randnc, realnoise, realbridge
@@ -29,5 +30,6 @@ include("families.jl")
 include("superpositions.jl")
 include("cats.jl")
 include("multimode.jl")
+include("channels.jl")
 
 end  
