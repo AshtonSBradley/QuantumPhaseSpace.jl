@@ -171,40 +171,6 @@ function wigner(rng::AbstractRNG,state::Fock,N)
     return α, α⁺
 end
 
-"""
-    α,α⁺ = positiveW(state <: State,N)
-
-Generate `N` samples from the positive-W (+W) phase-space distribution for `state`.
-
-Implemented states are
-
-- `Fock(N)`
-
-The moments of the +W distribution generate quantum operator averages that are symmmetrically ordered.
-"""
-function positiveW(rng::AbstractRNG,state::Fock,N)
-    N = _samplecount(N)
-    @unpack n = state
-    if n<=320
-    x1 = max(0,sqrt(n)-5); x2 = sqrt(n)+5
-    (n==0||n==1) ? Pmax=0.71 : Pmax=0.6
-    z = reject(rng,x->plaguerre.(x,n),[x1,x2],N,Pmax)
-    μ = z.*exp.(2π*im*rand(rng,N))
-    γ = randnc(rng,N)
-    α = μ .+ γ
-    α⁺ = conj(μ .- γ)
-    return α, α⁺
-    else
-    x1 = max(0,sqrt(n)-5); x2 = sqrt(n)+5
-    z = reject(rng,x->plaguerre_asymptotic.(x,n),[x1,x2],N,0.6)
-    μ = z.*exp.(2π*im*rand(rng,N))
-    γ = randnc(rng,N)
-    α = μ .+ γ
-    α⁺ = conj(μ .- γ)
-    return α, α⁺
-end
-end
-
 function glauberP(rng::AbstractRNG,state::Bogoliubov,N)
     return glauberP(rng,Gaussian(state),N)
 end

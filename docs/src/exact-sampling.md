@@ -206,3 +206,28 @@ TwoModeSqueezedThermal
 GaussianBogoliubov
 PhotonAddedGaussian
 ```
+
+## Separate positive-W track
+
+Generic `positiveW` convolves a valid positive-P pair with independent η=ξ/√2:
+`αW=αP+η`, `αWplus=αPplus+conj(η)`. This is an exact doubled representation.
+It supplies initial sampling, not a practical positive-W dynamical scheme.
+
+For Fock states set `K~Binomial(n,2/3)`, `X|K~Gamma(K+1,3/2)` and
+`μ=√X exp(iθ)`, then add/subtract independent unit circular γ in the canonical
+pair. To verify the mixture, expand
+`L_n(-4X/3)=Σ binomial(n,k)(4X/3)^k/k!`. Transforming the old radial law by
+`X=r²` yields `2 exp(-2X/3)L_n(-4X/3)/3^(n+1)`. Termwise comparison with
+Gamma(k+1,3/2) gives weights `binomial(n,k)(2/3)^k(1/3)^(n-k)`, summing to one.
+There is no finite rejection window or change of approximation at n=320.
+The exported Laguerre helpers and generic finite-window `reject` remain available
+for compatibility, and are not used by the default exact Fock positive-W path.
+
+For the canonical Q-derived construction the projection
+`μ=(α+conj(αplus))/2` has density `Q*G_(1/2)=W*G_1`, where
+`G_v(z)=exp(-|z|²/v)/(πv)`. It is a smoothed W, not ordinary W.
+Recovering W requires a separate noise-amplifying deconvolution. No projection
+is used to initialise ordinary-W dynamics. Weighted ordinary W, requiring
+explicit signed/complex weights and variance/convergence diagnostics, remains
+a deferred research track; arbitrary Q-derived positive-P may have unusable
+weight tails in such a construction.

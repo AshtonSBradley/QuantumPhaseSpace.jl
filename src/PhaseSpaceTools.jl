@@ -33,5 +33,6 @@ include("cats.jl")
 include("multimode.jl")
 include("channels.jl")
 include("gaussian.jl")
+include("positivew.jl")
 
 end  

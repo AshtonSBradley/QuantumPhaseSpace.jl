@@ -97,3 +97,14 @@ Validation: full Julia 1.13.3 tests passed, including 169 Gaussian/quadrature
 and 77 photon-added Gaussian checks. Independent density-matrix cutoffs were
 increased to 64/96 levels to achieve <1e-7 fourth-moment convergence; sampler
 code itself has no cutoff.
+
+## Separate Wplus track (complete)
+
+Added generic positive-P convolution and exact Fock binomial–Gamma sampling.
+Removed the finite window/asymptotic n=320 switch from the default positive-W
+path; retained every exported Laguerre helper. An independent density identity
+and symmetric first/fourth moments cover n=0,1,40,319,320,321,1000,10000.
+Projection is explicitly Gaussian-smoothed W, never an ordinary-W initialiser.
+Weighted ordinary W remains deferred as directed.
+
+Validation: full Julia 1.13.3 tests passed, including 139 exact positive-W checks.
