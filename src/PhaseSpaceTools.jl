@@ -13,6 +13,8 @@ export nmodes, sampleQ, sampleQ!, SamplingDiagnostics, SamplingError, acceptance
 export overlapcapability, PureOverlap, SamplingOnly, logoverlap
 export Displaced, Rotated, Mixture, ProductState, NumberMixture
 export PhotonAddedThermal, PhotonSubtractedThermal
+export Superposition, CoherentSuperposition, Compass, FockSuperposition, NOON
+export PhotonAddedCoherent, SqueezedCat, Cat, EvenCat, OddCat
 export State, Coherent, Squeezed, SqueezedTwoMode, Fock, Thermal, Crescent, Bogoliubov
 export glauberP, husimiQ, wigner, positiveP, positiveW
 export randnc, realnoise, realbridge
@@ -23,5 +25,7 @@ include("helpers.jl")
 include("infrastructure.jl")
 include("methods.jl")
 include("families.jl")
+include("superpositions.jl")
+include("cats.jl")
 
 end  

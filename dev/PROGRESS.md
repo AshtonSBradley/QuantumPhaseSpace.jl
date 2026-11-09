@@ -48,3 +48,18 @@ photon-subtracted thermal P/W/Q/positive-P. Probability laws are cached.
 Tests use explicit MersenneTwister RNGs and independently known Gamma moments.
 
 Validation: full Julia 1.13.3 tests passed, including 104 exact-family checks.
+
+## Stage 3 (complete)
+
+Implemented finite pure superpositions with cached Gram normalisation, |c|
+proposal weights, scaled logarithmic amplitudes and bounded rejection; coherent,
+Fock/product/displaced/rotated and pure squeezed components; cats with stable
+parity/small-odd proposals; compass, sparse Fock, NOON, photon-added coherent
+and squeezed-cat constructors. Small-odd envelope and accepted density are
+independently derived in docs/src/exact-sampling.md. Finite-Fock validation uses
+ladder matrices/exponentials independently of sampler formulas.
+
+Validation: full Julia 1.13.3 suite passed with 189 interference/overlap checks;
+90 additional independent pointwise odd-cat density/bound checks passed in the
+warm session. Exact odd parity compares Float64 π explicitly (the Irrational
+π equality edge case was caught and fixed).

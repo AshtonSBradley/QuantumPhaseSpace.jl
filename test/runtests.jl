@@ -516,3 +516,5 @@ end
 
 include("infrastructure.jl")
 include("families.jl")
+include("superpositions.jl")
+include("envelopes.jl")

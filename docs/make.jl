@@ -6,6 +6,7 @@ pages = [
 "Introduction to Phase Space" => "phasespace.md",
 "Quantum States" => "states.md",
 "Distributions" => "distributions.md",
+"Exact Q Sampling" => "exact-sampling.md",
 "Solving SDES" => "sdes.md"
 ],
 format = Documenter.HTML(
