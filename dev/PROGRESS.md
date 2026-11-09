@@ -39,3 +39,12 @@ ordinary P. Minimum Julia compatibility is explicitly 1.10 (the oldest installed
 channel to be tested), rather than an unverified Julia 1.0 claim.
 
 Validation: full Julia 1.13.3 package tests passed, including 102 infrastructure checks.
+
+## Stage 2 (complete)
+
+Added displacement (including the pure overlap phase), rotations, classical
+mixtures, product states, finite number mixtures, photon-added thermal Q and
+photon-subtracted thermal P/W/Q/positive-P. Probability laws are cached.
+Tests use explicit MersenneTwister RNGs and independently known Gamma moments.
+
+Validation: full Julia 1.13.3 tests passed, including 104 exact-family checks.

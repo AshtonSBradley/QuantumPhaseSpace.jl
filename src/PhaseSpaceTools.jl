@@ -11,6 +11,8 @@ import GSL:sf_laguerre_n
 
 export nmodes, sampleQ, sampleQ!, SamplingDiagnostics, SamplingError, acceptance_rate
 export overlapcapability, PureOverlap, SamplingOnly, logoverlap
+export Displaced, Rotated, Mixture, ProductState, NumberMixture
+export PhotonAddedThermal, PhotonSubtractedThermal
 export State, Coherent, Squeezed, SqueezedTwoMode, Fock, Thermal, Crescent, Bogoliubov
 export glauberP, husimiQ, wigner, positiveP, positiveW
 export randnc, realnoise, realbridge
@@ -20,5 +22,6 @@ include("types.jl")
 include("helpers.jl")
 include("infrastructure.jl")
 include("methods.jl")
+include("families.jl")
 
 end  
