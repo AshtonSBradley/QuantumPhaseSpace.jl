@@ -4,6 +4,7 @@ authors = ["Ashton Bradley <ashton.bradley@gmail.com>"]
 version = "1.0.7"
 
 [deps]
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 GSL = "92c85e6c-cbff-5e0c-80f7-495c94daaecd"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -13,19 +14,20 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
-Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [targets]
-test = ["Aqua", "Random", "Test", "Statistics"]
+test = ["Aqua", "Test", "Statistics"]
 
 [compat]
 Aqua = "0.8"
+Random = "1"
+LinearAlgebra = "1"
 Distributions = "0.25"
 GSL = "1, 1.0"
 Parameters = "0.12"
 Reexport = "1, 1.0, 1.1, 1.2"
 SpecialFunctions = "2"
 Test = "1"
-julia = "1"
+julia = "1.10"

@@ -28,3 +28,14 @@ regressions and Aqua.
 
 Stages 1–6, separate Wplus track, examples, benchmarks and final validation.
 No release, merge or publication is authorised.
+
+## Stage 1 (complete)
+
+Added RNG-first methods with default wrappers; matrix Q sampling and in-place
+entry points; legacy return adapters; finite-parameter/count checks; bounded
+rejection diagnostics; pure-overlap capability dispatch and stable logarithmic
+coherent, Fock and squeezed overlaps. Thermal positive-P now uses its narrow
+ordinary P. Minimum Julia compatibility is explicitly 1.10 (the oldest installed
+channel to be tested), rather than an unverified Julia 1.0 claim.
+
+Validation: full Julia 1.13.3 package tests passed, including 102 infrastructure checks.

@@ -5,9 +5,10 @@ Generate `N` samples from wigner phase-space distribution for `state`.
 
 Moments of the Wigner distribution generate symmetrically ordered quantum operator averages.
 """
-function wigner(state::Coherent,N)
+function wigner(rng::AbstractRNG,state::Coherent,N)
+    N = _samplecount(N)
     @unpack β = state
-    α = β .+ randnc(N)/sqrt(2)
+    α = β .+ randnc(rng,N)/sqrt(2)
     α⁺ = conj(α)
     return α, α⁺
 end
@@ -19,9 +20,10 @@ Generate `N` samples from the Husimi-Q phase-space distribution for `state`.
 
 Moments of the Husimi-Q distribution generate quantum operator averages that are anti-normally ordered.
 """
-function husimiQ(state::Coherent,N)
+function husimiQ(rng::AbstractRNG,state::Coherent,N)
+    N = _samplecount(N)
     @unpack β = state
-    α = β .+ randnc(N)
+    α = β .+ randnc(rng,N)
     α⁺ = conj(α)
     return α, α⁺
 end
@@ -35,15 +37,15 @@ Moments of the +P distribution generate quantum operator averages that are norma
 
 The doubled coordinates α,α⁺ need not be conjugates and are generally correlated. 
 """
-function positiveP(state::State,N)
-    μ,μ⁺ = husimiQ(state,N)
-    γ = randnc(N)
-    α = μ .+ γ
-    α⁺ = conj.(μ .- γ)
-    return α, α⁺
+function positiveP(rng::AbstractRNG,state::State,N)
+    N = _samplecount(N)
+    μ = sampleQ(rng,state,N)
+    γ = randnc(rng,size(μ)...)
+    return _legacy(state,μ .+ γ,conj.(μ .- γ))
 end
 
-function positiveP(state::Coherent,N)
+function positiveP(rng::AbstractRNG,state::Coherent,N)
+    N = _samplecount(N)
     @unpack β = state
     α = β*ones(N)
     α⁺ = conj(α)
@@ -57,44 +59,49 @@ Generate `N` samples from the Glauber-Sudarshan-P phase-space distribution for `
 
 Moments of the Glauber-Sudarshan-P distribution generate quantum operator averages that are normally ordered.
 """
-glauberP(state::Coherent,N) = positiveP(state,N)
+glauberP(rng::AbstractRNG,state::Coherent,N) = positiveP(rng,state,N)
 
-function glauberP(state::Thermal,N)
+function glauberP(rng::AbstractRNG,state::Thermal,N)
+    N = _samplecount(N)
     @unpack β,n̄ = state
-    α = β .+ sqrt(n̄)*randnc(N)
+    α = β .+ sqrt(n̄)*randnc(rng,N)
     α⁺ = conj(α)
     return α, α⁺
 end
 
-function wigner(state::Thermal,N)
+function wigner(rng::AbstractRNG,state::Thermal,N)
+    N = _samplecount(N)
     @unpack β,n̄ = state
-    α = β .+ sqrt(n̄ + .5)*randnc(N)
+    α = β .+ sqrt(n̄ + .5)*randnc(rng,N)
     α⁺ = conj(α)
     return α, α⁺
 end
 
-function husimiQ(state::Thermal,N)
+function husimiQ(rng::AbstractRNG,state::Thermal,N)
+    N = _samplecount(N)
     @unpack β,n̄ = state
-    α = β .+ sqrt(n̄ + 1.0)*randnc(N)
+    α = β .+ sqrt(n̄ + 1.0)*randnc(rng,N)
     α⁺ = conj(α)
     return α, α⁺
 end
 
-function husimiQ(state::Squeezed,N)
+function husimiQ(rng::AbstractRNG,state::Squeezed,N)
+    N = _samplecount(N)
     @unpack β,ϵ = state
     r = abs(ϵ)
     ϕ = angle(ϵ)/2
-    ν = sqrt(exp(-r)*cosh(r)/2)*randn(N) .+ im*sqrt(exp(r)*cosh(r)/2)*randn(N)
+    ν = sqrt(exp(-r)*cosh(r)/2)*randn(rng,N) .+ im*sqrt(exp(r)*cosh(r)/2)*randn(rng,N)
     α = β .+ exp(im*ϕ)*ν
     α⁺ = conj(α)
     return α, α⁺
 end
 
-function husimiQ(state::SqueezedTwoMode,N)
+function husimiQ(rng::AbstractRNG,state::SqueezedTwoMode,N)
+    N = _samplecount(N)
     @unpack r,ϕ = state
     λ = tanh(r)
-    x = randnc(N)*sqrt(2/(1-λ))
-    y = randnc(N)*sqrt(2/(1+λ))
+    x = randnc(rng,N)*sqrt(2/(1-λ))
+    y = randnc(rng,N)*sqrt(2/(1+λ))
     α = @. (-im*x +conj(y))*im*exp(im*ϕ)/2
     α⁺= conj.(α)
     β = @. (y -im*conj(x))*im*exp(im*ϕ)/2
@@ -102,10 +109,11 @@ function husimiQ(state::SqueezedTwoMode,N)
     return α, α⁺, β, β⁺
 end
 
-function positiveP(state::SqueezedTwoMode,N)
-    μa,μa⁺,μb,μb⁺ = husimiQ(state,N)
-    γa = randnc(N)
-    γb = randnc(N)
+function positiveP(rng::AbstractRNG,state::SqueezedTwoMode,N)
+    N = _samplecount(N)
+    μa,μa⁺,μb,μb⁺ = husimiQ(rng,state,N)
+    γa = randnc(rng,N)
+    γb = randnc(rng,N)
     α = μa .+ γa
     α⁺ = μa⁺ .- conj.(γa)
     β = μb .+ γb
@@ -113,47 +121,52 @@ function positiveP(state::SqueezedTwoMode,N)
     return α, α⁺, β, β⁺
 end
 
-function wigner(state::Squeezed,N)
+function wigner(rng::AbstractRNG,state::Squeezed,N)
+    N = _samplecount(N)
     @unpack β,ϵ = state
     r = abs(ϵ)
     ϕ = angle(ϵ)/2
-    α = β .+ 0.5*(randn(N)*exp(-r) .+ im*randn(N)*exp(r))*exp(im*ϕ)
+    α = β .+ 0.5*(randn(rng,N)*exp(-r) .+ im*randn(rng,N)*exp(r))*exp(im*ϕ)
     α⁺ = conj(α)
     return α, α⁺
 end
 
-function husimiQ(state::Crescent,N)
-    α, _ = wigner(state,N)
-    α .+= randnc(N)/sqrt(2)
+function husimiQ(rng::AbstractRNG,state::Crescent,N)
+    N = _samplecount(N)
+    α, _ = wigner(rng,state,N)
+    α .+= randnc(rng,N)/sqrt(2)
     return α, conj(α)
 end
 
-function wigner(state::Crescent,N)
+function wigner(rng::AbstractRNG,state::Crescent,N)
+    N = _samplecount(N)
     @unpack β,ϵ,q = state
     r = abs(ϵ)
     ϕ = angle(ϵ)/2
-    α = β .+ 0.5*(randn(N)*exp(-r) .+ im*randn(N)*exp(r))*exp(im*ϕ)
-    α = α.*exp.(im*q*randn(N))
+    α = β .+ 0.5*(randn(rng,N)*exp(-r) .+ im*randn(rng,N)*exp(r))*exp(im*ϕ)
+    α = α.*exp.(im*q*randn(rng,N))
     α⁺ = conj(α)
     return α, α⁺
 end
 
-function husimiQ(state::Fock,N)
+function husimiQ(rng::AbstractRNG,state::Fock,N)
+    N = _samplecount(N)
     @unpack n = state
     d = Gamma(n+1,1)
-    z = rand(d,N)
-    α = sqrt.(z).*exp.(2π*im*rand(N))
+    z = rand(rng,d,N)
+    α = sqrt.(z).*exp.(2π*im*rand(rng,N))
     α⁺ = conj(α)
     return α, α⁺
 end
 
-function wigner(state::Fock,N)
+function wigner(rng::AbstractRNG,state::Fock,N)
+    N = _samplecount(N)
     @unpack n = state
-    n == 0 && return wigner(Coherent(0),N)
+    n == 0 && return wigner(rng,Coherent(0),N)
     n < 10 && @warn "Fock state sampling for W is only valid for n ≫ 1."
     p = 0.5*sqrt(2*n+1+2*sqrt(n^2+n))
     q = 1/(4*p)
-    α = (p .+ q*randn(N)).*exp.(2π*im*rand(N))
+    α = (p .+ q*randn(rng,N)).*exp.(2π*im*rand(rng,N))
     α⁺ = conj(α)
     return α, α⁺
 end
@@ -169,29 +182,31 @@ Implemented states are
 
 The moments of the +W distribution generate quantum operator averages that are symmmetrically ordered.
 """
-function positiveW(state::Fock,N)
+function positiveW(rng::AbstractRNG,state::Fock,N)
+    N = _samplecount(N)
     @unpack n = state
     if n<=320
     x1 = max(0,sqrt(n)-5); x2 = sqrt(n)+5
     (n==0||n==1) ? Pmax=0.71 : Pmax=0.6
-    z = reject(x->plaguerre.(x,n),[x1,x2],N,Pmax)
-    μ = z.*exp.(2π*im*rand(N))
-    γ = randnc(N)
+    z = reject(rng,x->plaguerre.(x,n),[x1,x2],N,Pmax)
+    μ = z.*exp.(2π*im*rand(rng,N))
+    γ = randnc(rng,N)
     α = μ .+ γ
     α⁺ = conj(μ .- γ)
     return α, α⁺
     else
     x1 = max(0,sqrt(n)-5); x2 = sqrt(n)+5
-    z = reject(x->plaguerre_asymptotic.(x,n),[x1,x2],N,0.6)
-    μ = z.*exp.(2π*im*rand(N))
-    γ = randnc(N)
+    z = reject(rng,x->plaguerre_asymptotic.(x,n),[x1,x2],N,0.6)
+    μ = z.*exp.(2π*im*rand(rng,N))
+    γ = randnc(rng,N)
     α = μ .+ γ
     α⁺ = conj(μ .- γ)
     return α, α⁺
 end
 end
 
-function glauberP(state::Bogoliubov,N)
+function glauberP(rng::AbstractRNG,state::Bogoliubov,N)
+    N = _samplecount(N)
     (; u,v,n̄) = state
     occupation = (abs2(u) + abs2(v))*n̄ + abs2(v)
     anomalous = (2n̄ + 1)*u*conj(v)
@@ -202,31 +217,32 @@ function glauberP(state::Bogoliubov,N)
     tol = 100eps(Float64)*max(1,opnorm(V))
     minimum(E.values) >= -tol || throw(ArgumentError(
         "Bogoliubov state has no nonnegative ordinary Glauber P; use positiveP."))
-    x = E.vectors*Diagonal(sqrt.(max.(E.values,0)))*randn(2,N)
+    x = E.vectors*Diagonal(sqrt.(max.(E.values,0)))*randn(rng,2,N)
     α = complex.(x[1,:],x[2,:])
     return α, conj(α)
 end
 
-function wigner(state::Bogoliubov,N)
+function wigner(rng::AbstractRNG,state::Bogoliubov,N)
+    N = _samplecount(N)
     @unpack u,v,n̄ = state
-    β,β⁺ = wigner(Thermal(0.0,n̄),N)
+    β,β⁺ = wigner(rng,Thermal(0.0,n̄),N)
     α = u*β + conj(v)*β⁺
     α⁺ = conj.(α)
     return α,α⁺
 end
 
-function husimiQ(state::Bogoliubov,N)
+function husimiQ(rng::AbstractRNG,state::Bogoliubov,N)
+    N = _samplecount(N)
     @unpack u,v,n̄ = state
-    β,β⁺ = wigner(Thermal(0.0,n̄),N)
-    α = u.*β .+ conj(v).*β⁺ .+ randnc(N)/sqrt(2)  # convolve with Gaussian 
+    β,β⁺ = wigner(rng,Thermal(0.0,n̄),N)
+    α = u.*β .+ conj(v).*β⁺ .+ randnc(rng,N)/sqrt(2)  # convolve with Gaussian 
     α⁺ = conj.(α)
     return α,α⁺
 end
 
-# #TODO
-# function positiveW(state::Coherent,N)
-#     @unpack β = state
-#     α = β .+ randnc(N)/sqrt(2)
-#     α⁺ = conj(α)
-#     return α, α⁺
-# end
+# Backward-compatible default-RNG entry points.
+for sampler in (:husimiQ,:wigner,:glauberP,:positiveP,:positiveW)
+    @eval $sampler(state::State,N; kwargs...) = $sampler(Random.default_rng(),state,N; kwargs...)
+end
+
+positiveP(rng::AbstractRNG,state::Thermal,N) = glauberP(rng,state,N)

@@ -17,6 +17,10 @@ Create a coherent state with complex amplitude `β ∈ ℂ`.
 """
 struct Coherent <: State
     β::Complex{Float64}
+    function Coherent(β::ComplexF64)
+        isfinite(β) || throw(ArgumentError("Coherent requires finite β."))
+        new(β)
+    end
 end
 
 Coherent(β::Number) = Coherent(ComplexF64(β))
@@ -47,6 +51,10 @@ struct Crescent <: State
     β::Complex{Float64}
     ϵ::Complex{Float64}
     q::Float64
+    function Crescent(β::ComplexF64,ϵ::ComplexF64,q::Float64)
+        all(isfinite,(β,ϵ,q)) || throw(ArgumentError("Crescent requires finite parameters."))
+        new(β,ϵ,q)
+    end
 end
 
 Crescent(β::Number, ϵ::Number, q::Real) = Crescent(ComplexF64(β), ComplexF64(ϵ), Float64(q))
@@ -61,6 +69,10 @@ The centred anomalous moment is `-exp(iθ)sinh(r)cosh(r)`.
 struct Squeezed <: State
     β::Complex{Float64}
     ϵ::Complex{Float64}
+    function Squeezed(β::ComplexF64,ϵ::ComplexF64)
+        all(isfinite,(β,ϵ)) || throw(ArgumentError("Squeezed requires finite parameters."))
+        new(β,ϵ)
+    end
 end
 
 Squeezed(β::Number, ϵ::Number) = Squeezed(ComplexF64(β), ComplexF64(ϵ))
@@ -74,6 +86,7 @@ struct SqueezedTwoMode <: State
     r::Float64
     ϕ::Float64
     function SqueezedTwoMode(r::Float64, ϕ::Float64)
+        all(isfinite,(r,ϕ)) || throw(ArgumentError("SqueezedTwoMode requires finite parameters."))
         r >= 0 || throw(ArgumentError("SqueezedTwoMode requires r >= 0."))
         return new(r, ϕ)
     end
@@ -90,6 +103,7 @@ struct Thermal <: State
     β::Complex{Float64}
     n̄::Float64
     function Thermal(β::Complex{Float64}, n̄::Float64)
+        all(isfinite,(β,n̄)) || throw(ArgumentError("Thermal requires finite parameters."))
         n̄ >= 0 || throw(ArgumentError("Thermal state requires n̄ >= 0."))
         return new(β, n̄)
     end
@@ -107,6 +121,7 @@ struct Bogoliubov <: State
     v::Complex{Float64}
     n̄::Float64
     function Bogoliubov(u::Complex{Float64}, v::Complex{Float64}, n̄::Float64)
+        all(isfinite,(u,v,n̄)) || throw(ArgumentError("Bogoliubov requires finite parameters."))
         n̄ >= 0 || throw(ArgumentError("Bogoliubov state requires n̄ >= 0."))
         isapprox(abs2(u) - abs2(v), 1.0; atol=1e-8, rtol=1e-8) ||
             throw(ArgumentError("Bogoliubov state requires |u|^2 - |v|^2 ≈ 1."))

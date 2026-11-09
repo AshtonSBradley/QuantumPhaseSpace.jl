@@ -15,7 +15,8 @@ Usage:
 
 `a = randnc(50,100)` returns a `50x100-element Array{Complex{Float64},2}`.
 """
-randnc(args...) = randn(ComplexF64,args...)
+randnc(rng::AbstractRNG,args...) = randn(rng,ComplexF64,args...)
+randnc(args...) = randnc(Random.default_rng(),args...)
 
 
 """
@@ -32,28 +33,29 @@ Generate `x` distributed according to a probability distribution by rejection sa
 `Pmax`: numerical upper bound for `P`: `Pmax ≧ max(P(w))`.
 
 """
-function reject(P,w,N,Pmax)
+function reject(rng::AbstractRNG,P,w,N,Pmax;
+                max_attempts=_attemptlimit(N), diagnostics=false)
+    N = _samplecount(N)
+    length(w) == 2 || throw(ArgumentError("reject requires a two-element window."))
     a,b = w
-    N >= 0 || throw(ArgumentError("reject requires N >= 0."))
-    a < b || throw(ArgumentError("reject requires a finite window with w[1] < w[2]."))
+    isfinite(a) && isfinite(b) && a < b || throw(ArgumentError("reject requires finite w[1] < w[2]."))
     isfinite(Pmax) && Pmax > 0 || throw(ArgumentError("reject requires finite Pmax > 0."))
-    samples = Array{Float64}(undef,0)
-    sizehint!(samples,N)
-    attempts = 0
-    max_attempts = max(1_000, 1_000 * max(N, 1))
-    while length(samples) < N
-        y = a + rand()*(b - a)
-        z = rand()*Pmax
+    max_attempts = _samplecount(max_attempts)
+    samples = Vector{Float64}(undef,N)
+    stats = SamplingDiagnostics()
+    while stats.accepted < N
+        _proposal!(stats,max_attempts)
+        y = a + rand(rng)*(b-a)
         py = P(y)
-        isfinite(py) || throw(ArgumentError("reject requires P(y) to be finite over the sampling window."))
-        py >= 0 || throw(ArgumentError("reject requires P(y) >= 0 over the sampling window."))
-        py <= Pmax || throw(ArgumentError("reject requires Pmax >= P(y) over the sampling window."))
-        z < py && push!(samples,y)
-        attempts += 1
-        attempts <= max_attempts || throw(ArgumentError("reject exceeded $max_attempts attempts without collecting $N samples; check the sampling window and Pmax."))
+        isfinite(py) && 0 <= py <= Pmax || throw(ArgumentError("reject requires finite 0 <= P(y) <= Pmax."))
+        if rand(rng)*Pmax < py
+            stats.accepted += 1
+            samples[stats.accepted] = y
+        end
     end
-    return samples
+    return diagnostics ? (samples,stats) : samples
 end
+reject(P,w,N,Pmax;kwargs...) = reject(Random.default_rng(),P,w,N,Pmax;kwargs...)
 
 # Laguerre methods for +W
 plaguerre(x,n) = (4/3)*exp(-2*x^2/3 + log(x) + log(laguerren(-4*x^2/3,n)) - n*log(3))
