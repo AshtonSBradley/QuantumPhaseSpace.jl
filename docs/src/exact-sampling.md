@@ -118,3 +118,27 @@ References for representation conventions and state statistics:
 The rejection envelopes, small-odd proposal, binomial–Gamma positive-W law and
 collective-orbital construction are derived and verified here; no novelty claim
 is implied by their inclusion.
+
+## Passive transformations and fixed-number condensates
+
+`Passive(input,U)` uses `a_out=U*a_in` with a verified square unitary matrix.
+Supply vacuum modes explicitly, e.g. `ProductState(Fock(3),Fock(0))`. Each
+column of the Q matrix transforms by U. Internally `mul!` separates the mode
+operator from sample generation, allowing future structured-operator adapters.
+
+For `FixedNumberCondensate(N,u)`, `u†u=1`, draw a collective Fock Q amplitude
+`c=√X exp(iθ)`, `X~Gamma(N+1,1)`, and independent `ξ~CN(0,I)`. Then
+`z=u*c+(I-u*u†)ξ`. Orthogonality and `E|c|²=N+1` give
+`E[z z†]=I+N*u*u†`. No trajectory is rescaled to a fixed norm.
+
+The specialised positive-P draws one collective Fock positive-P pair and sets
+`α=u*a`, `αplus=conj(u)*ap`; orthogonal modes have deterministic zero positive-P
+vacuum. Normal ordering makes every orthogonal-vacuum contribution vanish,
+proving the construction. `method=:generic` uses independent noise in every
+mode through Q conversion. Both are exact, with potentially different estimator
+variances; benchmark them using the same observable.
+
+```@docs
+Passive
+FixedNumberCondensate
+```

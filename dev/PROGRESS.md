@@ -63,3 +63,13 @@ Validation: full Julia 1.13.3 suite passed with 189 interference/overlap checks;
 90 additional independent pointwise odd-cat density/bound checks passed in the
 warm session. Exact odd parity compares Float64 π explicitly (the Irrational
 π equality edge case was caught and fixed).
+
+## Stage 4 (complete)
+
+Added explicit unitary passive mixing and the O(M) collective-orbital exact Q
+sampler, plus specialised occupied-mode positive-P with zero orthogonal vacuum.
+Generic Q conversion remains selectable. Tests cover complex orbitals, vacuum,
+single/two/multiple modes, cross and fourth moments and an independent binomial
+Hilbert expansion. No per-sample number rescaling is present.
+
+Validation: full Julia 1.13.3 suite passed, including 348 multimode checks.
