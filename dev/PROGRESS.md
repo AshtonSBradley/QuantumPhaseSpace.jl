@@ -83,3 +83,17 @@ independent Kraus density matrices; first/anomalous/higher phase factors and
 identity/complete-loss limits are covered.
 
 Validation: full Julia 1.13.3 suite passed, including 99 channel checks.
+
+## Stage 6 (complete)
+
+Added general Gaussian covariance validation/cached factors, semidefinite P,
+squeezed-thermal/two-mode/multimode Bogoliubov constructors and the missing
+legacy two-mode W path. Added exact centred photon-added Gaussian Q through a
+nonnegative monomial mixture; its derivation and finite-density-matrix cutoff
+checks are included. The user specifically asked about quadrature units:
+explicit tests/documentation reconcile [x,p]=i with X=√2x,Y=√2p and [X,Y]=2i.
+
+Validation: full Julia 1.13.3 tests passed, including 169 Gaussian/quadrature
+and 77 photon-added Gaussian checks. Independent density-matrix cutoffs were
+increased to 64/96 levels to achieve <1e-7 fourth-moment convergence; sampler
+code itself has no cutoff.

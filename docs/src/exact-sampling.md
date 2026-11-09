@@ -162,3 +162,47 @@ pure-state overlaps for coherent superpositions.
 Loss
 PhaseDiffused
 ```
+
+## General Gaussian states and quadrature units
+
+`Gaussian(β,V)` orders quadratures `(x₁,p₁,x₂,p₂,...)`, with
+`x=(a+a†)/√2`, `p=(a-a†)/(i√2)` and `[x,p]=i`. V is the symmetrised
+**centred** covariance. Vacuum V is I/2. The equally valid convention
+`X=a+a†=√2x`, `Y=(a-a†)/i=√2p` has `[X,Y]=2i`, vacuum covariance I,
+and `a=(X+iY)/2`. Convert an `(X,Y)` covariance by `V=VXY/2` before passing
+it to this API; the complex displacement β is unchanged. Regression tests check
+both commutators, reconstructions of a, and vacuum sample variances.
+
+The W covariance is V, Q covariance V+I/2, and nonnegative ordinary P covariance
+V-I/2. The uncertainty test is `V+iΩ/2≥0`, where Ω has 2×2 blocks
+`[0 1;-1 0]`. Eigenvalue tolerances scale with the input precision and covariance
+norm. Covariance factors are prepared once, including zero eigenvalues in
+classical P limits. Coherent/thermal/squeezed legacy fast paths retain their
+public calls; tests compare their conventions to the general covariance model.
+
+`SqueezedThermal` follows the single-mode negative anomalous-moment convention.
+`TwoModeSqueezedThermal` retains the legacy `SqueezedTwoMode(r,ϕ)` convention
+`⟨a₁a₂⟩=exp(2iϕ)sinh(r)cosh(r)` for vacuum input. `GaussianBogoliubov` uses
+`a=U*b+conj(V)*b†` and checks both canonical identities. Every Gaussian state
+has Q-derived positive-P; ordinary P rejects nonclassical covariances.
+
+For `PhotonAddedGaussian` the state must be centred and single mode. Diagonalise
+its quadrature Q covariance with principal variances v₁,v₂. Expanding
+`(x₁²+x₂²)^m` gives nonnegative weights
+`binomial(m,k) E[x₁^(2k)] E[x₂^(2(m-k))]`. Each component draws independent
+signed squared coordinates from `Gamma(k+1/2,2v₁)` and
+`Gamma(m-k+1/2,2v₂)`, then rotates back and divides by √2. This follows directly
+by multiplying each normal density by its even monomial. For m=1, choosing the
+inflated coordinate has probability vⱼ/(v₁+v₂), with shape 3/2 on that coordinate
+and 1/2 on the other. The common factor 2^-m from `|z|^(2m)` cancels in
+normalisation. Tests independently apply creation operators to finite density
+matrices and verify cutoff convergence. The centred formula is not applied to
+displaced inputs.
+
+```@docs
+Gaussian
+SqueezedThermal
+TwoModeSqueezedThermal
+GaussianBogoliubov
+PhotonAddedGaussian
+```

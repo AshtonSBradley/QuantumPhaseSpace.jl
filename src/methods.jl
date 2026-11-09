@@ -206,20 +206,7 @@ end
 end
 
 function glauberP(rng::AbstractRNG,state::Bogoliubov,N)
-    N = _samplecount(N)
-    (; u,v,n̄) = state
-    occupation = (abs2(u) + abs2(v))*n̄ + abs2(v)
-    anomalous = (2n̄ + 1)*u*conj(v)
-    # Covariance of (Re α, Im α), including the transformed vacuum.
-    V = [occupation + real(anomalous) imag(anomalous);
-         imag(anomalous) occupation - real(anomalous)]/2
-    E = eigen(Symmetric(V))
-    tol = 100eps(Float64)*max(1,opnorm(V))
-    minimum(E.values) >= -tol || throw(ArgumentError(
-        "Bogoliubov state has no nonnegative ordinary Glauber P; use positiveP."))
-    x = E.vectors*Diagonal(sqrt.(max.(E.values,0)))*randn(rng,2,N)
-    α = complex.(x[1,:],x[2,:])
-    return α, conj(α)
+    return glauberP(rng,Gaussian(state),N)
 end
 
 function wigner(rng::AbstractRNG,state::Bogoliubov,N)
