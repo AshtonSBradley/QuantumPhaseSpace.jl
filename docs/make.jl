@@ -3,11 +3,11 @@ using Documenter, PhaseSpaceTools
 makedocs(sitename="PhaseSpaceTools.jl",
 pages = [
 "Overview" => "index.md",
-"Sampling a Schrödinger Cat" => "cat-q.md",
 "Introduction to Phase Space" => "phasespace.md",
 "Quantum States" => "states.md",
 "Distributions" => "distributions.md",
 "Exact Q Sampling" => "exact-sampling.md",
+"Example: Cat States" => "cat-q.md",
 "Support and Examples" => "support.md",
 "Solving SDES" => "sdes.md"
 ],

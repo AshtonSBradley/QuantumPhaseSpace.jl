@@ -1,4 +1,10 @@
-# [Sampling a Schrödinger cat](@id cat-q-tutorial)
+# [Cat states by rejection sampling](@id cat-q-tutorial)
+
+This worked example applies the rejection method introduced in
+[Exact Q Sampling](exact-sampling.md) to a coherent superposition. The Gaussian
+proposal samples a classical mixture; the acceptance step produces the cat's
+interference. We compare the resulting Q samples, then check their moments and
+acceptance rates.
 
 A cat state coherently combines two coherent states centred at opposite complex
 amplitudes, **+α and −α**. The relative sign distinguishes even and odd cats:
@@ -32,6 +38,47 @@ These axes are complex-amplitude coordinates, Re z and Im z. In the package's
 quadrature convention `z=(x+ip)/√2`; the alternative convention uses
 `z=(X+iY)/2`, with `X=√2x`, `Y=√2p`. See
 [General Gaussian states and quadrature units](@ref).
+
+## [Larger cats: resolving Q interference](@id cat-q-fringes)
+
+Larger amplitudes produce more closely spaced interference fringes in Q. Their
+absolute density also becomes much smaller: the interference term contains
+`exp(-abs2(α))`. A common linear colour scale emphasises the coherent peaks and
+can hide this weak structure between them. For real α the fringes run along
+Im z, perpendicular to the separation of the components along Re z.
+
+![Large-cat positive Q functions on a shared logarithmic colour scale, with oscillating even and odd central line cuts and a smooth classical mixture.](assets/cat-q-interference.png)
+
+*Analytic Q densities at α=3. The top panels use a shared logarithmic colour
+scale, with a display floor of 10⁻⁹. The lower panel cuts through the interference
+region at Re z=0. All three curves use the same constant scale
+Qmix(0)=exp(−9)/π≈3.93×10⁻⁵; the original density is recovered by multiplying
+by that value. The line cuts use unfloored densities, including the true nodes.
+[Download PDF](assets/cat-q-interference.pdf) ·
+[Unscaled line-cut data](assets/cat-q-interference-cut.tsv).*
+
+For real α, set `A=α²` and `z=iy`. The positive Q densities on this cut are
+
+```math
+\begin{aligned}
+Q_+(iy)&=\frac{2e^{-A-y^2}\cos^2(\alpha y)}{\pi(1+e^{-2A})},\\[4pt]
+Q_-(iy)&=\frac{2e^{-A-y^2}\sin^2(\alpha y)}{\pi(1-e^{-2A})},\\[4pt]
+Q_{\mathrm{mix}}(iy)&=\frac{e^{-A-y^2}}{\pi}.
+\end{aligned}
+```
+
+The oscillatory factors have period Δy=π/α. At α=3 the even-cat central density
+is only about 7.86×10⁻⁵, compared with a coherent-peak density near 0.16. The
+logarithmic view and common-scale line cut reveal the alternating even/odd lobes;
+the mixture gives a smooth envelope. Q remains nonnegative throughout. For the
+Q definition and the significance of its zeros, see
+[Teh et al., Appendix A](https://arxiv.org/pdf/1910.01298).
+
+This large-cat view uses the analytic density rather than a sparse histogram
+of the overlap region. The figure generator independently checks these line
+cuts against an 80-level Fock calculation (the coherent-state omitted tail is
+below 10⁻⁴⁰). The plotted densities themselves use exact coherent overlaps and
+have no Fock cutoff.
 
 ## Draw Q samples
 
@@ -258,7 +305,8 @@ include("examples/cat_q.jl")
 CatQShowcase.make_cat_q_figures()
 ```
 
-The script writes PNG/PDF comparisons and their validation table under
+The script writes PNG/PDF sampled comparisons, the analytic large-cat fringe
+view, and their validation tables under
 `docs/src/assets`. It uses CairoMakie, 300,000 samples per state, and explicit
 MersenneTwister seeds 4242 and 4243. The plotting range affects only the displayed
 histogram; the samplers themselves have no spatial window.

@@ -150,7 +150,7 @@ branch has separate commits for stages 0–6 and positive-W. Known limits:
 
 ## Cat-Q documentation showcase (complete, 10 November 2026)
 
-Added a visual cat-state tutorial ahead of the derivations, with exact Q sample
+Added a visual cat-state tutorial, with exact Q sample
 histograms for even/odd cats and the equal classical mixture of ±α. A second
 comparison rotates α by π/6. The README and documentation navigation now lead
 to the tutorial; examples cover diagnostics, Q ordering, relative phase, loss
@@ -160,3 +160,30 @@ probability and acceptance checks; observed occupation/central errors are below
 2.2 standard errors. Clean Documenter build, 7 executable tutorial blocks,
 and package doctests pass. Standalone figures and the main rendered page were
 visually checked. Details: CAT_Q_DOCS.md. Core samplers remain unchanged.
+
+
+## Documentation reading order (10 November 2026)
+
+Moved “Example: Cat States” immediately after “Exact Q Sampling” in the
+navigation. The tutorial now introduces cats as a worked rejection example,
+and the overview and method-page links follow the same method-then-example
+sequence. Existing page URL and reference anchor are preserved.
+
+
+## Large-cat Q interference (complete)
+
+Added an α=3 analytic Q view with shared logarithmic colour and a central
+Re z=0 cut. The cut is rescaled by the same explicit Qmix(0) for all states;
+no signed quasiprobability or Wigner density is substituted. The tutorial
+explains the oscillatory factor period π/α, exponential absolute suppression,
+and why the original linear histogram hides the fringes. Independent finite
+Fock and closed-form line-cut checks accompany the figure generator.
+
+
+The large-cat line cuts agree with closed cos²/sin² expressions and an
+independent 80-level Fock calculation to 1.28e-19 absolute Q error. The coherent
+Poisson tail beyond the validation cutoff is 4.24e-47; plotting uses analytic
+coherent overlaps with no cutoff. The PDF rasterises only its dense heatmaps
+and retains vector curves/text. Clean Documenter build and live navigation
+checks pass. “Example: Cat States” follows “Exact Q Sampling” immediately.
+The new section is available at cat-q.html#cat-q-fringes in the local preview.

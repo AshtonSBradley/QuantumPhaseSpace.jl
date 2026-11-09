@@ -121,10 +121,109 @@ function make_comparison(α,N,seed,pathbase,amplitude_label)
     return checks
 end
 
+# A finite-Fock calculation is an independent check of the analytic line cuts.
+# It is used only for validation, never for sampling or drawing the Q density.
+function coherent_coefficients(β,K)
+    v = zeros(ComplexF64,K)
+    v[1] = exp(-abs2(β)/2)
+    for n in 1:K-1
+        v[n+1] = β*v[n]/sqrt(n)
+    end
+    return v
+end
+
+"""Show weak large-cat Q interference using logarithmic colour and a central cut."""
+function make_large_cat_interference(;output=joinpath(@__DIR__,"..","docs","src","assets"))
+    mkpath(output)
+    α = 3.0
+    A,d = α^2,exp(-2α^2)
+    reference = exp(-A)/π
+    ys = range(-2.5,2.5;length=2001)
+    plus = [cat_density(im*y,α,1)/reference for y in ys]
+    minus = [cat_density(im*y,α,-1)/reference for y in ys]
+    mixed = [mixture_density(im*y,α)/reference for y in ys]
+    plus_target = @. 2exp(-ys^2)*cos(α*ys)^2/(1+d)
+    minus_target = @. 2exp(-ys^2)*sin(α*ys)^2/(1-d)
+    @assert maximum(abs.(plus .- plus_target))<1e-12
+    @assert maximum(abs.(minus .- minus_target))<1e-12
+    @assert maximum(abs.(mixed .- exp.(-ys .^ 2)))<1e-12
+    # Check the exact nodes and the fringe period of the actual positive Q law.
+    @assert cat_density(0,α,-1)==0
+    @assert cat_density(im*π/(2α),α,1)<1e-30
+    @assert isapprox(cat_density(0,α,1)/reference,2/(1+d);rtol=1e-13)
+    K = 80
+    tail = ccdf(Poisson(A),K-1)
+    @assert tail<1e-40
+    v = coherent_coefficients(α,K)
+    even,odd = copy(v),copy(v)
+    even[2:2:end] .= 0
+    odd[1:2:end] .= 0
+    even ./= norm(even)
+    odd ./= norm(odd)
+    max_fock_error = 0.0
+    for y in range(-2.5,2.5;length=101), (state,parity) in ((even,1),(odd,-1))
+        coherent = coherent_coefficients(im*y,K)
+        fock_q = abs2(dot(coherent,state))/π
+        exact_q = cat_density(im*y,α,parity)
+        @assert isapprox(fock_q,exact_q;rtol=1e-10,atol=1e-18)
+        max_fock_error = max(max_fock_error,abs(fock_q-exact_q))
+    end
+    figure = with_theme(theme_latexfonts()) do
+        fig = Figure(size=(1000,690),fontsize=20,figure_padding=20)
+        Label(fig[0,1:4],"α = 3   ·   Analytic Husimi–Q densities";fontsize=21,tellwidth=false)
+        xs,imaginary = range(-4.5,4.5;length=721),range(-2.3,2.3;length=369)
+        cases = (("Even cat",z->cat_density(z,α,1)),
+                 ("Odd cat",z->cat_density(z,α,-1)),
+                 ("Classical mixture",z->mixture_density(z,α)))
+        heat = nothing
+        for (j,(name,density)) in enumerate(cases)
+            ax = Axis(fig[1,j];title=name,xlabel="Re z",ylabel=j==1 ? "Im z" : "",
+                aspect=DataAspect(),xticks=[-3,0,3],yticks=[-2,0,2],
+                xgridvisible=false,ygridvisible=false,xticklabelsize=17,yticklabelsize=17)
+            values = [density(complex(x,y)) for x in xs,y in imaginary]
+            @assert minimum(values)>=0
+            heat = heatmap!(ax,xs,imaginary,max.(values,1e-9);
+                colormap=:Blues,colorscale=log10,colorrange=(1e-9,0.2),rasterize=2)
+            scatter!(ax,[-α,α],[0,0];marker=:xcross,markersize=12,color=:darkorange3)
+            limits!(ax,-4.5,4.5,-2.3,2.3)
+            hidespines!(ax,:t,:r)
+        end
+        Colorbar(fig[1,4],heat;label="Q(z), log scale",width=14,
+            ticks=([1e-8,1e-5,1e-2,1e-1],["10⁻⁸","10⁻⁵","10⁻²","10⁻¹"]),
+            ticklabelsize=17,labelsize=18,spinewidth=0.5)
+        cut = Axis(fig[2,1:4];title="Central overlap cut: Re z = 0",xlabel="Im z",
+            ylabel="Q(i y) / Qmix(0)",xticks=-2:1:2,yticks=[0,1,2],
+            xgridvisible=false,ygridvisible=false,xticklabelsize=17,yticklabelsize=17)
+        lines!(cut,ys,plus;color=:dodgerblue3,linewidth=2.5,label="Even cat")
+        lines!(cut,ys,minus;color=:darkorange3,linewidth=2.5,label="Odd cat")
+        lines!(cut,ys,mixed;color=:gray40,linewidth=2,linestyle=:dash,label="Classical mixture")
+        limits!(cut,-2.5,2.5,0,2.13)
+        hidespines!(cut,:t,:r)
+        Legend(fig[3,1:4],cut;orientation=:horizontal,framevisible=false,labelsize=18)
+        Label(fig[4,1:4],"Common line-cut scale: Qmix(0) = exp(−9)/π ≈ 3.93 × 10⁻⁵";
+            fontsize=18,tellwidth=false)
+        colgap!(fig.layout,12)
+        rowgap!(fig.layout,10)
+        fig
+    end
+    save(joinpath(output,"cat-q-interference.png"),figure;px_per_unit=2)
+    save(joinpath(output,"cat-q-interference.pdf"),figure)
+    open(joinpath(output,"cat-q-interference-cut.tsv"),"w") do io
+        println(io,"imag_z\tQ_even\tQ_odd\tQ_mixture")
+        for y in range(-2.5,2.5;length=401)
+            println(io,join((y,cat_density(im*y,α,1),cat_density(im*y,α,-1),mixture_density(im*y,α)),'\t'))
+        end
+    end
+    checks = (;alpha=α,fringe_period=π/α,mixture_origin=reference,
+        even_origin=cat_density(0,α,1),fock_cutoff=K,poisson_tail=tail,max_fock_error)
+    println("Large-cat Q validation: ",checks)
+    return checks
+end
+
 """
     make_cat_q_figures(; N=300_000, output=...)
 
-Regenerate both comparison figures and the numerical validation record. No
+Regenerate the sampled comparisons, large-cat interference view and validation data. No
 finite-window sampling is used. The plotted histograms keep their full-batch
 normalisation, and the record reports the fraction inside the display window.
 """
@@ -143,6 +242,7 @@ function make_cat_q_figures(;N::Integer=300_000,
             println(io,join(values(row),'\t'))
         end
     end
+    make_large_cat_interference(;output)
     println("Saved cat Q comparisons and validation: ",record)
     return checks
 end

@@ -33,3 +33,25 @@ The independent midpoint integrals over [-7,7]² differ from unit normalisation 
 - `git diff --check` passed.
 - No sampler implementation or package dependency changed; only documentation/example environments gained declarations for their imports. The existing full sampler test baseline remains recorded in `VALIDATION.md`.
 - Local documentation build only; no deployment or publication.
+
+
+## Reading order and large-cat interference update
+
+The cat tutorial now follows Exact Q Sampling as “Example: Cat States”, with
+an explicit rejection-method introduction. The page URL and anchor remain
+stable. The new cat-q-interference PNG/PDF shows α=3 analytic positive Q
+functions on a shared log scale (colour floor 1e-9) and a Re z=0 line cut.
+All curves share the constant reference exp(-9)/π=3.9282560692794874e-5;
+unscaled density samples are in cat-q-interference-cut.tsv. There are no signed
+weights or Wigner substitutions. The oscillatory factor period is π/3.
+
+Validation: closed-form line cuts agree within 1e-12 in scaled units; exact
+nodes are checked. An independent 80-level Fock calculation agrees within
+1.275e-19 absolute Q error, with coherent-state omitted tail 4.237e-47. The
+figures themselves have no Fock truncation. The even-cat central Q density is
+7.856512018904454e-5, explaining its invisibility on the original linear scale.
+Clean documentation build executes all seven tutorial blocks; HTTP checks
+confirm the updated reading order and live interference section.
+
+The rebuilt tutorial, new log-density/line-cut figure and reordered sidebar
+were visually checked in the rendered local page at 1280 px width.

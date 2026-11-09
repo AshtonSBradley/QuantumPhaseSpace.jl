@@ -1,8 +1,9 @@
 # Exact Q sampling and quantum superpositions
 
-Start with the [cat-state Q tutorial](@ref cat-q-tutorial) for runnable examples
-and sampled even/odd/mixture comparisons. This page develops the rejection
-bounds, overlap conventions and extensions behind those examples.
+This page develops the rejection bounds, overlap conventions and extensions
+for exact Q sampling. The following [cat-state example](@ref cat-q-tutorial)
+applies the method to even and odd cats, with sampled Q comparisons against
+the classical mixture of their coherent components.
 
 ## Pure overlaps and coherent sums
 
