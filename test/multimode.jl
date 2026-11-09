@@ -39,6 +39,7 @@
     end
     @test_throws ArgumentError FixedNumberCondensate(1,[1,1])
     @test_throws ArgumentError FixedNumberCondensate(-1,[1])
+    @test_throws ArgumentError Superposition((Passive(input,U),),[1])
     @test_throws ArgumentError Passive(input,[1 1;0 1])
     @test_throws DimensionMismatch Passive(input,ones(1,1))
     @test all(iszero,first(positiveP(FixedNumberCondensate(0,u),3)))

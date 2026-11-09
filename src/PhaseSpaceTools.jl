@@ -5,7 +5,9 @@ using Random
 using SpecialFunctions: loggamma
 @reexport using Distributions
 @reexport using LinearAlgebra
-@reexport using Parameters
+# Parameters 0.12 exports an undefined @pack; preserve its valid legacy exports.
+@reexport using Parameters: Parameters, @with_kw, @with_kw_noshow, type2dict,
+    reconstruct, @unpack, @pack!, @consts
 
 import GSL:sf_laguerre_n
 

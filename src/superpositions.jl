@@ -1,3 +1,5 @@
+_primitives(s::State) = throw(ArgumentError("analytic pairwise Gram preparation is not implemented for $(typeof(s)); use the documented coherent/Fock/squeezed components or expand their sums componentwise."))
+
 # Normalised Bargmann primitives: displaced Fock (κ=0), or pure Gaussian (n=0).
 _primitive(s::Coherent) = (β=s.β,κ=0.0im,n=0,phase=0.0)
 _primitive(s::Fock) = (β=0.0im,κ=0.0im,n=s.n,phase=0.0)

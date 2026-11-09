@@ -2,10 +2,11 @@
 
 using PhaseSpaceTools, Test, Statistics, Aqua, Random
 Random.seed!(0x514e)
+const test_rng = MersenneTwister(0x514e)
 include("scientific.jl")
 
 function randuv()
-    u,v = randnc(2)
+    u,v = randnc(test_rng,2)
     nrm = abs2(u)-abs2(v)
     if nrm < 0
         new = [0 1;1 0]*[u; v]
@@ -23,7 +24,7 @@ occ_from_q(a, ā)      = real(mean(a .* ā)) - 1.0
 occ_from_p(a, ā)      = real(mean(a .* ā))
 
 @testset "Aqua" begin
-    Aqua.test_all(PhaseSpaceTools; undefined_exports=false, deps_compat=false)
+    Aqua.test_all(PhaseSpaceTools)
 end
 
 @testset "Arg tests" begin 
@@ -136,13 +137,13 @@ end
 @testset "Noises" begin 
 
     N = 100_000
-    a = randnc(N)
+    a = randnc(test_rng,N)
 
     @test isapprox(mean(abs2.(a)),1.0,rtol=5e-2)
     @test isapprox(abs(mean(a)),0.0,atol=1e-2)
 
     x = zeros(10_000)
-    realnoise(x, nothing, 0.25, Random.default_rng())
+    realnoise(x, nothing, 0.25, test_rng)
     @test isapprox(mean(x), 0.0, atol=2e-2)
     @test isapprox(mean(abs2, x), 0.25, rtol=8e-2)
 
@@ -150,7 +151,7 @@ end
     q = 0.3
     h = 0.5
     Wh = fill(1.5, 10_000)
-    realbridge(bridge, nothing, nothing, Wh, q, h, Random.default_rng())
+    realbridge(bridge, nothing, nothing, Wh, q, h, test_rng)
     @test isapprox(mean(bridge), q * 1.5, atol=2e-2)
     @test isapprox(var(bridge), (1 - q) * q * h, rtol=1e-1)
 end
@@ -164,7 +165,7 @@ end
     state = Squeezed(β, ϵ)
     N = 20_000
 
-    a, ā = husimiQ(state, N)
+    a, ā = husimiQ(test_rng,state,N)
 
     @test length(a) == N
     @test all(ā .== conj.(a))
@@ -179,7 +180,7 @@ end
     state = Crescent(β, ϵ, 0.0)
     N = 20_000
 
-    a, ā = husimiQ(state, N)
+    a, ā = husimiQ(test_rng,state,N)
 
     @test length(a) == N
     @test all(ā .== conj.(a))
@@ -193,7 +194,7 @@ end
     N = 100000
     α = 100
     state = Coherent(α)
-    a,ā = wigner(state,N)
+    a,ā = wigner(test_rng,state,N)
 
     meana = mean(a)
     n̄ = real(mean(@. ā*a)-.5)
@@ -210,7 +211,7 @@ end
 
     state = SqueezedTwoMode(0.3, π/7)
     N = 5_000
-    a, a⁺, b, b⁺ = husimiQ(state, N)
+    a, a⁺, b, b⁺ = husimiQ(test_rng,state,N)
 
     @test length(a) == N
     @test length(b) == N
@@ -222,9 +223,9 @@ end
 @testset "Coherent +P" begin 
 
     N = 1000
-    α = 100*randnc()
+    α = 100*randnc(test_rng)
     state = Coherent(α)
-    a,ā = positiveP(state,N)
+    a,ā = positiveP(test_rng,state,N)
 
 
     meana = mean(a)
@@ -243,7 +244,7 @@ end
 
     state = Fock(0)
     N = 10_000
-    a, ā = positiveW(state, N)
+    a, ā = positiveW(test_rng,state,N)
 
     @test length(a) == N
     @test length(ā) == N
@@ -256,7 +257,7 @@ end
     n = 500
     N = 20_000
     state = Fock(n)
-    a, ā = positiveW(state, N)
+    a, ā = positiveW(test_rng,state,N)
 
     n̄ = real(mean(a .* ā) - 0.5)
     @test length(a) == N
@@ -273,15 +274,15 @@ end
     β = 0.
     s = Thermal(β,n)
 
-    a,ā = glauberP(s,N)
+    a,ā = glauberP(test_rng,s,N)
     na = real(mean(a.*ā))
     @test isapprox(na,n,atol=.9)
 
-    a,ā = wigner(s,N)
+    a,ā = wigner(test_rng,s,N)
     na = real(mean(a.*ā))-0.5
     @test isapprox(na,n,atol=.9)
 
-    a,ā = husimiQ(s,N)
+    a,ā = husimiQ(test_rng,s,N)
     na = real(mean(a.*ā))-1.0
     @test isapprox(na,n,atol=.9)
 
@@ -293,7 +294,7 @@ end
     n = 100
     N = 100000
     state = Fock(n)
-    a,ā = wigner(state,N)
+    a,ā = wigner(test_rng,state,N)
 
     meana = mean(a)
     absa = abs(meana)
@@ -316,7 +317,7 @@ end
     n = 99
     N = 100_000
     state = Fock(n)
-    a,ā = positiveW(state,N)
+    a,ā = positiveW(test_rng,state,N)
 
     meana = mean(a)
     absa = abs(meana)
@@ -340,7 +341,7 @@ end
     state = Fock(n)
     N = 100000
 
-    a,ā = positiveW(state,N)
+    a,ā = positiveW(test_rng,state,N)
 
     av_a = mean(a)
     absa = abs(av_a)
@@ -358,14 +359,13 @@ end
 
 @testset "Fock +P" begin
     n = 3
-    a, ap = positiveP(Fock(n), 200_000)
+    a, ap = positiveP(test_rng,Fock(n),200_000)
     checkmean(ap .* a, n)
     checkmean(ap.^2 .* a.^2, n*(n-1))
     # Preserve the signed complex estimator and its imaginary residual.
     n_est = mean(ap .* a)
-    variance = mean(ap.^2 .* a.^2) + n_est - n_est^2
-    @test abs(real(variance)) < 0.2
-    @test abs(imag(variance)) < 0.2
+    variance_samples = ap.^2 .* a.^2 .+ (1-2n_est).*(ap.*a) .+ n_est^2
+    checkmean(variance_samples,0)
 end
 
 @testset "Squeezed +P " begin 
@@ -378,7 +378,7 @@ end
     state = Squeezed(β,ϵ)
     N = 10000
 
-    a,ā = positiveP(state,N)
+    a,ā = positiveP(test_rng,state,N)
 
     av_a = mean(a);absa = abs(av_a)
     n̄ = real(mean(a.*ā))
@@ -400,7 +400,7 @@ n̄ = sinh(r)^2
 state = SqueezedTwoMode(r,ϕ)
 N = 1000000
 
-a,a⁺,b,b⁺ = positiveP(state,N)
+a,a⁺,b,b⁺ = positiveP(test_rng,state,N)
 
 na = mean(a.*a⁺) |> real
 nb = mean(b.*b⁺) |> real
@@ -430,7 +430,7 @@ end
     ϵ = r*exp(2*im*ϕ)
     state = Squeezed(β,ϵ)
     N = 10000
-    a,ā = wigner(state,N)
+    a,ā = wigner(test_rng,state,N)
 
     av_a = mean(a);absa = abs(av_a)
     n̄ = real(mean(a.*ā)-.5)
@@ -450,7 +450,7 @@ end
     @test abs2(u) - abs2(v) ≈ 1.0
 
     state = Bogoliubov(u, v, n̄)
-    a, ā = wigner(state, N)
+    a, ā = wigner(test_rng,state,N)
 
     na  = occ_from_wigner(a, ā)
     nth = particle_occupation(u, v, n̄)
@@ -458,7 +458,7 @@ end
     @test isapprox(na, nth, rtol = 1e-1)
 
     state = Bogoliubov(u, v, 0)
-    a, ā = wigner(state, N)
+    a, ā = wigner(test_rng,state,N)
 
     na   = occ_from_wigner(a, ā)
     nvac = particle_occupation(u, v, 0)
@@ -474,7 +474,7 @@ end
     @test abs2(u) - abs2(v) ≈ 1.0
 
     state = Bogoliubov(u, v, n̄)
-    a, ā = husimiQ(state, N)
+    a, ā = husimiQ(test_rng,state,N)
 
     na  = occ_from_q(a, ā)
     nth = particle_occupation(u, v, n̄)
@@ -482,7 +482,7 @@ end
     @test isapprox(na, nth, rtol = 1e-1)
 
     state = Bogoliubov(u, v, 0)
-    a, ā = husimiQ(state, N)
+    a, ā = husimiQ(test_rng,state,N)
 
     na   = occ_from_q(a, ā)
     nvac = particle_occupation(u, v, 0)
@@ -498,7 +498,7 @@ end
     @test abs2(u) - abs2(v) ≈ 1.0
 
     state = Bogoliubov(u, v, n̄)
-    a, ā = positiveP(state, N)
+    a, ā = positiveP(test_rng,state,N)
 
     na  = occ_from_p(a, ā)
     nth = particle_occupation(u, v, n̄)
@@ -506,7 +506,7 @@ end
     @test isapprox(na, nth, rtol = 1e-1)
 
     state = Bogoliubov(u, v, 0)
-    a, ā = positiveP(state, N)
+    a, ā = positiveP(test_rng,state,N)
 
     na   = occ_from_p(a, ā)
     nvac = particle_occupation(u, v, 0)
