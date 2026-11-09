@@ -24,10 +24,10 @@ standard errors, with a fixed baseline seed.
 Validation: Julia 1.13.3 `Pkg.test()` passed, including 104 scientific
 regressions and Aqua.
 
-## Remaining
+## Scope
 
-Stages 1–6, separate Wplus track, examples, benchmarks and final validation.
-No release, merge or publication is authorised.
+Stages 0–6 and the independent Wplus track are complete. Release, merge and
+publication decisions remain separate; no release or merge was performed.
 
 ## Stage 1 (complete)
 
@@ -72,7 +72,7 @@ Generic Q conversion remains selectable. Tests cover complex orbitals, vacuum,
 single/two/multiple modes, cross and fourth moments and an independent binomial
 Hilbert expansion. No per-sample number rescaling is present.
 
-Validation: full Julia 1.13.3 suite passed, including 348 multimode checks.
+Validation: full Julia 1.13.3 suite passed, including 349 multimode checks.
 
 ## Stage 5 (complete)
 
@@ -107,4 +107,42 @@ and symmetric first/fourth moments cover n=0,1,40,319,320,321,1000,10000.
 Projection is explicitly Gaussian-smoothed W, never an ordinary-W initialiser.
 Weighted ordinary W remains deferred as directed.
 
-Validation: full Julia 1.13.3 tests passed, including 139 exact positive-W checks.
+Validation: full Julia 1.13.3 tests passed, including 140 exact positive-W checks.
+
+## Final validation (complete)
+
+Enabled all Aqua checks, including previously disabled undefined-export and
+compatibility checks. Parameters 0.12 reexports an undefined `@pack`; explicit
+reexport of its seven implemented APIs (and module binding) preserves working
+legacy names and removes that nonexistent symbol. Added Statistics compatibility
+and CI coverage for Julia 1.10 and 1.13. Benchmarks and executable examples have completed; no default Julia channel or
+installed runtime was changed.
+
+
+Full final package tests pass on Julia 1.10.12 and 1.13.3, with every Aqua check
+enabled. Statistical tests use explicit seeded RNGs; default-RNG API wrappers
+retain argument/return tests. Signed Fock number variance uses its estimator
+uncertainty. Documenter doctests and local HTML build pass without warnings.
+All 23 examples run. Benchmark report and all 66 measurements are committed.
+See VALIDATION.md for counts and benchmark/REPORT.md for variance/time comparisons.
+
+## Resume / remaining limitations
+
+No required implementation stage remains open. Review or release/merge is the
+next human decision; no network publication was performed. The development
+branch has separate commits for stages 0–6 and positive-W. Known limits:
+
+- Ordinary Fock W remains explicitly approximate for every n>0.
+- Generic superposition Gram preparation supports the documented coherent,
+  Fock, product and squeezed component families. Passive/collective inputs
+  expose pointwise overlaps but require further pairwise-Gram implementations
+  to become components; unsupported cases fail informatively.
+- Near-destructive general-phase sums can have low acceptance. Finite-precision
+  overlap/Gram limits and configurable proposal exhaustion are explicit.
+- The public passive constructor accepts explicit unitary matrices; structured
+  operators can extend the existing mul! sampling contract.
+- Photon addition to Gaussian states is centred, single-mode only.
+- Weighted ordinary W, direct general Gaussian positive-P factorisation, GPU
+  support and automatic differentiation are deferred/optional as directed.
+- Initial estimator variance does not establish dynamical positive-P stability.
+- Local tests passed; GitHub-hosted CI was configured but not triggered here.

@@ -38,7 +38,7 @@ julia> real(mean(samples_conj .* samples))
 
 For coherent states, the `+P` representation is deterministic: `samples` and `samples_conj` are fixed at `α` and `conj(α)`.
 
-## Implemented states
+## Core states
 
 - `Bogoliubov`
 - `Coherent`
@@ -47,6 +47,13 @@ For coherent states, the `+P` representation is deterministic: `samples` and `sa
 - `Squeezed`
 - `SqueezedTwoMode`
 - `Thermal`
+
+Exact Q extensions include cats and finite coherent/Fock superpositions, NOON
+states, photon-added and photon-subtracted families, passive multimode states,
+fixed-number condensates, Gaussian covariance states, and loss/phase-diffusion
+channels. All inherit exact positive-P sampling. See the
+[state × representation table](docs/src/support.md) for the full API and its
+exact/approximate/unsupported distinctions.
 
 ### Coherent state
 A coherent state |α⟩ is sampled as
@@ -66,11 +73,24 @@ s = Fock(n) # define number state |n⟩
 N = 1000 # number of samples
 a,a⁺ = wigner(s,N)
 ```
-Provides an approximate sampling of `W` that reproduces operator averages for large `n`. For small `n`, use with care: the implementation warns that the approximation is only valid when `n ≫ 1`.
+Provides an approximate sampling of `W` that reproduces operator averages for large `n`. For every `n>0` this is explicitly an approximation, useful when `n ≫ 1`. `Fock(0)` uses the exact vacuum Gaussian.
 
 ## Examples
 
-See `/examples/sampling.ipynb` for more usage.
+See [`examples/exact_sampling.jl`](examples/exact_sampling.jl) for seeded examples
+of cats, photon addition, NOON states, fixed-number condensates and preparation
+loss. All samplers accept an explicit RNG as their first argument. `sampleQ`
+always returns a modes × samples matrix; historical single-mode vectors and the
+legacy two-mode four-vector interfaces remain available.
+
+The [support table](docs/src/support.md) distinguishes exact laws, explicit
+approximations and unsupported methods. Positive-W is a doubled representation,
+with generally correlated nonconjugate coordinates, and is not ordinary W.
+Gaussian covariances use `[x,p]=i` and vacuum `I/2`; divide an `[X,Y]=2i`
+covariance by two before using `Gaussian`.
+
+Development evidence and outstanding limitations are recorded in
+[`dev/PROGRESS.md`](dev/PROGRESS.md).
 
 # External links
 ___Numerical representation of quantum states in the positive-P and Wigner representations,___ \

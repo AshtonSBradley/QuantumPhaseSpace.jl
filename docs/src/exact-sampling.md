@@ -25,7 +25,12 @@ The cached Gram matrix comes from analytic Bargmann Gaussian integration and
 normalised polynomial recurrences, evaluated at higher precision during
 preparation. This uses no Fock cutoff. Near-zero states with extremely small
 acceptance remain inefficient and can exhaust the configurable attempt limit.
-Finite precision can make extremely ill-conditioned Gram problems unresolved;
+Pure-overlap capability alone does not guarantee that every pairwise Gram
+integral is implemented. Passive and collective-orbital states have pointwise
+overlaps but are not currently supported as generic superposition components.
+For operations wrapping an entire sum, expand the operation componentwise before
+nesting it in another sum. Unsupported Gram preparation raises an informative
+error. Finite precision can make extremely ill-conditioned Gram problems unresolved;
 such cases raise an error rather than inventing a normalisation.
 
 Displacement retains the phase
