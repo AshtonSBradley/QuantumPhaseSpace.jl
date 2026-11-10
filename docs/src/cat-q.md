@@ -39,25 +39,38 @@ quadrature convention `z=(x+ip)/√2`; the alternative convention uses
 `z=(X+iY)/2`, with `X=√2x`, `Y=√2p`. See
 [General Gaussian states and quadrature units](@ref).
 
-## [Larger cats: resolving Q interference](@id cat-q-fringes)
+## [Larger cats: locating weak Q interference](@id cat-q-fringes)
 
-Larger amplitudes produce more closely spaced interference fringes in Q. Their
-absolute density also becomes much smaller: the interference term contains
-`exp(-abs2(α))`. A common linear colour scale emphasises the coherent peaks and
-can hide this weak structure between them. For real α the fringes run along
-Im z, perpendicular to the separation of the components along Re z.
+For **real α=3**, an ordinary Q plot is dominated by two Gaussian-like peaks
+near **z=±3**. The interference lies in the much weaker central region around
+**Re z=0**, varying along Im z. A plot through either coherent peak is a
+different cut and will not resemble the central interference profile. The
+relative fringe contrast falls as `sech(2α Re z)`, giving a characteristic
+transverse scale `1/(2α)`, about 0.17 here. This is a thin strip between lobes
+separated by six amplitude units.
 
-![Large-cat positive Q functions on a shared logarithmic colour scale, with oscillating even and odd central line cuts and a smooth classical mixture.](assets/cat-q-interference.png)
+![Full even-cat, odd-cat and mixture Q densities on a common linear scale, followed by a detail cut in unscaled Q units.](assets/cat-q-interference.png)
 
-*Analytic Q densities at α=3. The top panels use a shared logarithmic colour
-scale, with a display floor of 10⁻⁹. The lower panel cuts through the interference
-region at Re z=0. All three curves use the same constant scale
-Qmix(0)=exp(−9)/π≈3.93×10⁻⁵; the original density is recovered by multiplying
-by that value. The line cuts use unfloored densities, including the true nodes.
-[Download PDF](assets/cat-q-interference.pdf) ·
-[Unscaled line-cut data](assets/cat-q-interference-cut.tsv).*
+*Top: the full Q functions on a shared **linear** colour scale over
+−5.5≤Re z, Im z≤5.5. The coherent peaks are near ±3. Dotted segments mark the
+central line cut shown below. Bottom: that cut in **raw Q units**, with a
+separate vertical range reaching only about 8×10⁻⁵. The main peaks above
+reach about 0.159. [Download PDF](assets/cat-q-interference.pdf) ·
+[Raw line-cut data](assets/cat-q-interference-cut.tsv).*
 
-For real α, set `A=α²` and `z=iy`. The positive Q densities on this cut are
+The large-cat Q functions look almost identical on this full linear scale.
+For the even cat, Q(0)≈7.86×10⁻⁵ is only **0.049% of the main-peak height**.
+The detail panel makes this very small central structure visible; it does not
+represent the height or dominant shape of the full distribution.
+
+The oscillations can also be located in a [logarithmic diagnostic view](assets/cat-q-interference-log.png)
+([PDF](assets/cat-q-interference-log.pdf)). That view uses a colour floor of
+10⁻⁹ and divides its central line cut by the explicitly labelled constant
+Qmix(0)=exp(−9)/π≈3.93×10⁻⁵. This increases the cut's plotted height by about
+25,500. It is a magnified diagnostic, so its appearance differs substantially
+from an ordinary linear Q plot.
+
+For real α, set `A=α²` and `z=iy`. The exact central cuts are
 
 ```math
 \begin{aligned}
@@ -67,18 +80,34 @@ Q_{\mathrm{mix}}(iy)&=\frac{e^{-A-y^2}}{\pi}.
 \end{aligned}
 ```
 
-The oscillatory factors have period Δy=π/α. At α=3 the even-cat central density
-is only about 7.86×10⁻⁵, compared with a coherent-peak density near 0.16. The
-logarithmic view and common-scale line cut reveal the alternating even/odd lobes;
-the mixture gives a smooth envelope. Q remains nonnegative throughout. For the
-Q definition and the significance of its zeros, see
+The oscillatory factors have period Δy=π/α. Larger amplitudes pack more fringes
+into the central region, while the absolute density there falls as exp(−α²).
+Q remains nonnegative: the interference appears as small positive lobes and
+nodes. For the Q definition and the significance of its zeros, see
 [Teh et al., Appendix A](https://arxiv.org/pdf/1910.01298).
 
-This large-cat view uses the analytic density rather than a sparse histogram
-of the overlap region. The figure generator independently checks these line
-cuts against an 80-level Fock calculation (the coherent-state omitted tail is
-below 10⁻⁴⁰). The plotted densities themselves use exact coherent overlaps and
-have no Fock cutoff.
+### Compare coordinate conventions
+
+These figures use the density with respect to `d(Re z) d(Im z)`. If your plot
+uses quadrature coordinates, both the positions and the density per coordinate
+area change:
+
+| Axes | Coordinate relation | Coherent centres for α=3 | Density in those coordinates |
+|:--|:--|:--|:--|
+| u=Re z, v=Im z | z=u+iv | (±3,0) | Q(z) |
+| x,p | z=(x+ip)/√2 | (±3√2,0) | Q(z)/2 |
+| X,Y | z=(X+iY)/2 | (±6,0) | Q(z)/4 |
+
+The density factors are the Jacobians of these coordinate changes. For a
+complex α, the two centres rotate with α and the interference cut must rotate
+with them. With unit direction `e=α/abs(α)`, the corresponding central cut is
+`z=i e y`.
+
+The figures use analytic coherent overlaps without a Fock cutoff. Validation
+compares the central cuts and a two-dimensional grid over the entire displayed
+square against an independent 80-level Fock calculation. The coherent-state
+omitted tail in that validation is below 10⁻⁴⁰. These analytic views do not
+claim that a modest sample histogram resolves the very weak central fringes.
 
 ## Draw Q samples
 

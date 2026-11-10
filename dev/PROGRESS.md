@@ -187,3 +187,24 @@ coherent overlaps with no cutoff. The PDF rasterises only its dense heatmaps
 and retains vector curves/text. Clean Documenter build and live navigation
 checks pass. “Example: Cat States” follows “Exact Q Sampling” immediately.
 The new section is available at cat-q.html#cat-q-fringes in the local preview.
+
+
+## Q plot presentation audit (10 November 2026)
+
+A user comparison showed that the log map and rescaled central cut did not
+represent the appearance of an ordinary linear full-Q plot. The main α=3 figure
+now shows the entire [-5.5,5.5]² plane with a linear colour range [0,0.17] and
+puts the central cut below in raw Q units. The old log/rescaled view is retained
+only as an explicitly labelled diagnostic. Cat-lobe peaks are 0.1591549455;
+Qeven(0)=7.856512e-5, a ratio of 0.000493639 (0.049%).
+
+The central cut was correctly located at Re z=0 for real α. A new full 41×41
+2D Fock-overlap audit over the displayed plane has maximum absolute Q error
+2.50e-16; the separate line-cut check remains 1.28e-19. The tutorial now states
+the perpendicular strip width, rotation for complex α, and coordinate/density
+Jacobians for Re z/Im z, canonical x/p, and X/Y conventions. A direct comparison
+to the user's plot still requires their α and plotting expression/ranges.
+
+The revised figures were inspected, and the clean Documenter build executes
+all seven tutorial examples without warnings. The corrected raw-density view
+is live in the existing local preview.

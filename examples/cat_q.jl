@@ -132,7 +132,7 @@ function coherent_coefficients(β,K)
     return v
 end
 
-"""Show weak large-cat Q interference using logarithmic colour and a central cut."""
+"""Compare full linear Q densities with a separate weak-interference diagnostic."""
 function make_large_cat_interference(;output=joinpath(@__DIR__,"..","docs","src","assets"))
     mkpath(output)
     α = 3.0
@@ -168,6 +168,24 @@ function make_large_cat_interference(;output=joinpath(@__DIR__,"..","docs","src"
         @assert isapprox(fock_q,exact_q;rtol=1e-10,atol=1e-18)
         max_fock_error = max(max_fock_error,abs(fock_q-exact_q))
     end
+    # Also audit the full 2D plane, not just the selected central cut.
+    max_plane_error = 0.0
+    negative = coherent_coefficients(-α,K)
+    for x in range(-5.5,5.5;length=41), y in range(-5.5,5.5;length=41)
+        probe = coherent_coefficients(complex(x,y),K)
+        for (state,parity) in ((even,1),(odd,-1))
+            fock_q = abs2(dot(probe,state))/π
+            direct_q = cat_density(complex(x,y),α,parity)
+            @assert abs(fock_q-direct_q)<1e-13
+            max_plane_error = max(max_plane_error,abs(fock_q-direct_q))
+        end
+        fock_mix = (abs2(dot(probe,v))+abs2(dot(probe,negative)))/(2π)
+        @assert abs(fock_mix-mixture_density(complex(x,y),α))<1e-13
+    end
+    peak = cat_density(α,α,1)
+    origin = cat_density(0,α,1)
+    @assert isapprox(peak,(1+d)/(2π);rtol=1e-13)
+    @assert origin/peak<0.0005
     figure = with_theme(theme_latexfonts()) do
         fig = Figure(size=(1000,690),fontsize=20,figure_padding=20)
         Label(fig[0,1:4],"α = 3   ·   Analytic Husimi–Q densities";fontsize=21,tellwidth=false)
@@ -206,8 +224,50 @@ function make_large_cat_interference(;output=joinpath(@__DIR__,"..","docs","src"
         rowgap!(fig.layout,10)
         fig
     end
-    save(joinpath(output,"cat-q-interference.png"),figure;px_per_unit=2)
-    save(joinpath(output,"cat-q-interference.pdf"),figure)
+    save(joinpath(output,"cat-q-interference-log.png"),figure;px_per_unit=2)
+    save(joinpath(output,"cat-q-interference-log.pdf"),figure)
+    # Lead with the ordinary full Q density. The separate central cut retains
+    # raw Q units; no division by the tiny mixture density is hidden here.
+    plain = with_theme(theme_latexfonts()) do
+        fig = Figure(size=(1000,800),fontsize=20,figure_padding=20)
+        Label(fig[0,1:4],"α = 3   ·   Full Husimi–Q densities, linear colour";
+            fontsize=21,tellwidth=false)
+        xs = range(-5.5,5.5;length=601)
+        cases = (("Even cat",z->cat_density(z,α,1)),
+                 ("Odd cat",z->cat_density(z,α,-1)),
+                 ("Classical mixture",z->mixture_density(z,α)))
+        heat = nothing
+        for (j,(name,density)) in enumerate(cases)
+            ax = Axis(fig[1,j];title=name,xlabel="Re z",ylabel=j==1 ? "Im z" : "",
+                aspect=DataAspect(),xticks=[-3,0,3],yticks=[-3,0,3],
+                xgridvisible=false,ygridvisible=false,xticklabelsize=17,yticklabelsize=17)
+            values = [density(complex(x,y)) for x in xs,y in xs]
+            heat = heatmap!(ax,xs,xs,values;colormap=:Blues,colorrange=(0,0.17),rasterize=2)
+            scatter!(ax,[-α,α],[0,0];marker=:xcross,markersize=12,color=:darkorange3)
+            lines!(ax,[0,0],[-2.5,2.5];color=:gray50,linestyle=:dot,linewidth=1.2)
+            limits!(ax,-5.5,5.5,-5.5,5.5)
+            hidespines!(ax,:t,:r)
+        end
+        Colorbar(fig[1,4],heat;label="Q(z), linear scale",width=14,
+            ticks=[0,0.08,0.16],ticklabelsize=17,labelsize=18,spinewidth=0.5)
+        cut = Axis(fig[2,1:4];title="Detail: central cut through Re z = 0",xlabel="Im z",
+            ylabel="Q(i y)",ylabelpadding=24,xticks=-2:1:2,
+            yticks=([0,4e-5,8e-5],["0","4 × 10⁻⁵","8 × 10⁻⁵"]),
+            xgridvisible=false,ygridvisible=false,xticklabelsize=17,yticklabelsize=17)
+        lines!(cut,ys,plus.*reference;color=:dodgerblue3,linewidth=2.5,label="Even cat")
+        lines!(cut,ys,minus.*reference;color=:darkorange3,linewidth=2.5,label="Odd cat")
+        lines!(cut,ys,mixed.*reference;color=:gray40,linewidth=2,linestyle=:dash,label="Classical mixture")
+        limits!(cut,-2.5,2.5,0,2.13reference)
+        hidespines!(cut,:t,:r)
+        Legend(fig[3,1:4],cut;orientation=:horizontal,framevisible=false,labelsize=18)
+        Label(fig[4,1:4],"Central fringes reach only 0.049% of the main-peak height; raw Q units in both rows.";
+            fontsize=17,tellwidth=false)
+        colgap!(fig.layout,12)
+        rowgap!(fig.layout,10)
+        fig
+    end
+    save(joinpath(output,"cat-q-interference.png"),plain;px_per_unit=2)
+    save(joinpath(output,"cat-q-interference.pdf"),plain)
     open(joinpath(output,"cat-q-interference-cut.tsv"),"w") do io
         println(io,"imag_z\tQ_even\tQ_odd\tQ_mixture")
         for y in range(-2.5,2.5;length=401)
@@ -215,7 +275,8 @@ function make_large_cat_interference(;output=joinpath(@__DIR__,"..","docs","src"
         end
     end
     checks = (;alpha=α,fringe_period=π/α,mixture_origin=reference,
-        even_origin=cat_density(0,α,1),fock_cutoff=K,poisson_tail=tail,max_fock_error)
+        even_origin=origin,coherent_peak=peak,central_to_peak=origin/peak,
+        fock_cutoff=K,poisson_tail=tail,max_fock_error,max_plane_error)
     println("Large-cat Q validation: ",checks)
     return checks
 end

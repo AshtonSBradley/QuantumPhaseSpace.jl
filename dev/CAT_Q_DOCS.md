@@ -55,3 +55,21 @@ confirm the updated reading order and live interference section.
 
 The rebuilt tutorial, new log-density/line-cut figure and reordered sidebar
 were visually checked in the rendered local page at 1280 px width.
+
+
+## Presentation audit: full plot versus central detail
+
+The former large-cat lead image was a log-colour diagnostic with its central
+curve divided by Qmix(0). This overemphasised the appearance of the very weak
+central fringes relative to an ordinary full-Q plot. The replacement lead
+image has common linear colour on [-5.5,5.5]² and raw-density central cuts.
+The separate log diagnostic is preserved as cat-q-interference-log.png/pdf.
+The central cut is correctly perpendicular to real ±α; its contrast scale is
+1/(2α). Coordinate positions and Jacobians are documented explicitly.
+
+Independent full-plane validation at 41×41 points (80-level Fock vectors) gives
+maximum absolute Q error 2.498e-16. The analytic even-cat lobe height at z=α is
+0.15915494551582188 and its origin density is 7.856512018904454e-5, only
+0.049363920131% of that height. The central cut check retains 1.275e-19 absolute
+agreement. The logarithmic plot and cut rescaling were a presentation issue,
+not a change in the Q formula or sampler. No sampler source changed.
