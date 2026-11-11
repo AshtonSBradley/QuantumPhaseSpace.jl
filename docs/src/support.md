@@ -56,7 +56,11 @@ and collective-orbital samplers introduce no Hilbert-space cutoff.
 ## Examples
 
 Start with the [cat-state Q tutorial](@ref cat-q-tutorial) for a visual comparison
-of even and odd cats with the classical mixture of ±α.
+of even and odd cats with the classical mixture of ±α. The
+[Fock-basis examples](@ref fock-basis-examples) cover phase-sensitive
+moments, Kerr revivals and canonical thermal sampling. The
+[positive-W example](@ref positive-w-sampling) uses exact number-state
+draws and Weyl symbols for intensity moments.
 
 The executable `examples/exact_sampling.jl` demonstrates a cat, photon-added
 thermal and coherent states, NOON, a complex fixed-N condensate, a lossy cat,

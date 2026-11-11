@@ -8,6 +8,7 @@ pages = [
 "Distributions" => "distributions.md",
 "Exact Q Sampling" => "exact-sampling.md",
 "Example: Cat States" => "cat-q.md",
+"Examples: Fock-Basis States" => "fock-basis.md",
 "Support and Examples" => "support.md",
 "Solving SDES" => "sdes.md"
 ],

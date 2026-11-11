@@ -65,7 +65,7 @@ In this code we make frequent use of the $Q$ function to sample other distributi
 In the next section we outline the main application of this relationship, which is sampling particular +P distributions for states where a $Q$ function may be easily sampled. 
 
 ## Positive-P representation
-In the Positive-P representation a simple way to sample the state is again as a point on the complex plane
+Positive-P uses two complex coordinates per mode. For a single mode, draw them with
 
 ```julia
 α,α⁺ = positiveP(state,N)
@@ -73,7 +73,7 @@ In the Positive-P representation a simple way to sample the state is again as a 
 
 Here ``α,α⁺`` are no longer in general complex conjugates. Even if they are initial conjugates, we emphasize that this is no longer the case in subsequent dynamical evolution of the ensemble of phase space points. Furthermore, unlike the Glauber-P distribution, the +P distribution for a particular quantum state is not unique.
 
-In this package we primarily focus on single mode problems, taking the general approach of sampling the Husimi-Q function, and then exploiting a simple convolutional relationship between the Husimi-Q and a particular choice of +P representation.
+The canonical construction starts from a Husimi Q draw and adds independent circular noise to form the doubled pair.
 
 A particular choice of +P that can be made for any single mode density matrix is given by
 ```math
@@ -87,9 +87,10 @@ with inverse
 ```math
 \alpha = \mu + \gamma,\quad\quad \alpha^+ = \mu^* - \gamma^*.
 ```
-The problem reduces to that of sampling the  distribution
+The real Jacobian of the inverse map is 4 per mode. The density in the
+new coordinates is
 ```math
-P(\mu,\gamma)=Q(\mu,\mu^*)\frac{e^{-|\gamma|^2}}{\pi}
+\widetilde P(\mu,\gamma)=Q(\mu,\mu^*)\frac{e^{-|\gamma|^2}}{\pi}
 ```
 where
 ```math
@@ -106,12 +107,49 @@ Here ``\eta_j`` are independent normal random variates with zero mean and unit v
 ```
 Normally distributed Gaussian variates are sampled using `randn()`.
 
-We should emphasize that all states with $Q$ function sampling in this package are also available in the +P representation via this approach. To see details of sampling for a given distribution, see `src/methods.jl`.
+The diagonal matrix element enters the canonical density linearly. The same
+coordinate assignment applies to number states, with the Gamma-distributed
+squared radius in $\mu$. These conventions incorporate the corrections to
+Eqs. (18) and (33) in the [SciPost commentary](https://scipost.org/commentaries/10.1016/j.optcom.2009.06.033/).
+For several modes, draw $\mu$ jointly from Q and add independent difference
+noise in each mode. The [support table](support.md) lists the available
+samplers.
 ## Wigner-representation
 The Wigner function generates symmetrically ordered operator averages from its moments. It is often used due to being well suited for identifying semi-classical approximations. Many of the simpler Wigner functions are well known and straightforward to sample. However, when the $W$ function has negative regions, or oscillates rapidly, sampling can be more challenging. In this package we implement previously developed methods for sampling Fock states, and also develop a new method to sample Fock states in the positive Wigner representation, a doubled-phase space representation that allows the distribution to remain positive everywhere. 
 
+## Thermal and phase-diffused Gaussian states
+
+For [`Thermal`](@ref), let $\beta$ be the displacement, $\bar n$ the thermal
+occupation and $\xi=(g_1+ig_2)/\sqrt{2}$ with independent unit real
+Gaussians $g_1,g_2$. Draw the amplitude $\beta+\sqrt{v}\,\xi$ with
+$v=\bar n$ for the diagonal P and positive-P samplers, $v=\bar n+1/2$
+for ordinary Wigner, and $v=\bar n+1$ for Husimi Q.
+
+For a centred thermal state with $\bar n>0$, the second normally ordered
+intensity moment is $2\bar n^2$, giving $g^{(2)}(0)=2$. The original
+real Gaussian radius with a uniform phase would give $g^{(2)}(0)=3$.
+The [published erratum](https://doi.org/10.1016/j.optcom.2016.02.068)
+gives the corrected thermal noise. To recover the same normally ordered
+moment from Wigner samples use $R^2-2R+1/2$ with $R=|w|^2$. For Q
+samples the symbol is $R^2-4R+2$ with $R=|z|^2$.
+
+For [`Crescent`](@ref), the Wigner draw rotates the full displaced
+squeezed amplitude by an independent Gaussian angle. Its Q draw adds
+independent circular noise of complex variance $1/2$ after the
+rotation. This isotropic broadening preserves the anomalous moment
+$\langle a^2\rangle$. The model describes phase diffusion of a squeezed
+state. The [Kerr example](@ref fock-basis-examples) uses the unitary
+number-dependent phase.
+
 ## Positive Wigner representation
-Just as the phase space of the P-representation can be doubled to give the positive-P, we can also double the phase space of the W-representation, to give a positive-W representation. The relationship between positive-P and positive-W is a convolution
+Positive-W uses a doubled pair. Starting from a positive-P draw, add
+$\eta$ to $\alpha$ and $\eta^*$ to $\alpha^+$, with independent circular
+Gaussian $\eta$ of complex variance $1/2$. Its average in the moment
+generator gives the factor $\exp(st/2)$ that converts
+$\langle e^{s a^\dagger}e^{t a}\rangle$ to the Weyl generator
+$\langle e^{s a^\dagger+t a}\rangle$.
+
+The corresponding density is the convolution
 ```math
 W_+(\alpha,\alpha^+)=\frac{2}{\pi}\int d^2\lambda e^{-2|\lambda|^2}P_+(\alpha+\lambda,\alpha^++\lambda^*).
 ```
@@ -158,12 +196,18 @@ and the identity $L_{-n}(x)=e^xL_{n-1}(-x)$, we arrive at
 ```math
 \tilde W_+(\gamma,\mu) = \frac{e^{-|\gamma|^2}}{\pi}\frac{2e^{-2|\mu|^2/3}}{\pi 3^{n+1}}L_n(-4|\mu|^2/3)
 ```
-The $\gamma$ distribution is easily sampled. For the distribution of $\mu\in \mathbb{C}$, as it only depends on $|\mu|\in [0,\infty)$, we can sample it via the correctly normalized distribution for $|\mu|=x$
+The noise $\gamma$ remains independent of the centre $\mu$. The radial
+density for $|\mu|=x$ is
 ```math
 P_{|\mu|}(x)=\frac{4 x e^{-2x^2/3}}{3^{n+1}}L_n(-4x^2/3),
 ```
-such that $\int_0^\infty \;dx P_{|\mu|}(x)=1$, 
-and then apply a uniformly sampled random phase $\theta \in [0,2\pi)$ to construct samples on the complex plane
+To sample it over the full radial range, draw $K$ from
+$\operatorname{Binomial}(n,2/3)$, then $X$ from
+$\operatorname{Gamma}(K+1,3/2)$ in shape–scale form. Set $x=\sqrt X$
+and draw an independent uniform phase $\theta\in[0,2\pi)$ to obtain
 ```math
 \mu = x e^{i\theta}.
 ```
+
+See the [doubled positive-W example](@ref positive-w-sampling) for the
+mixture derivation and Weyl estimators.

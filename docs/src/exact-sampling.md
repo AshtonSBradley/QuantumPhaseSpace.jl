@@ -68,14 +68,39 @@ The implementation selects whichever exact proposal has higher expected
 acceptance and evaluates `sinh(t)/t` by analytic continuation near zero.
 `OddCat(0)` raises an error; `Fock(1)` is an explicit limiting choice.
 
-## Finite expansions and multimode applications
+## [Finite expansions and multimode applications](@id finite-fock-superpositions)
 
 `FockSuperposition(n,c)` accepts sparse single-mode integer occupations or a
 modes × components integer matrix. It is exact for that expansion. For an
 approximation to an infinite state, report the supplied cutoff and omitted
-probability independently. `NOON(N;phase)` uses two orthogonal product Fock
-components and has exactly 1/2 acceptance at every N. Efficient sample generation
-does not imply low variance for high-order coherence estimators.
+probability independently.
+
+For a single mode, the coherent-state overlap and its Husimi Q density are
+
+```math
+A_n(z)=\langle z|n\rangle
+      =e^{-|z|^2/2}\frac{(z^*)^n}{\sqrt{n!}},
+\qquad
+Q_n(z)=\frac{|A_n(z)|^2}{\pi}
+      =\frac{e^{-|z|^2}|z|^{2n}}{\pi n!}.
+```
+
+The sampler selects occupation `n` with probability `|cₙ|/C`, then draws
+`z=√X exp(iθ)` with `X~Gamma(n+1,1)` (shape and scale) and an independent
+uniform phase on `[0,2π)`. To apply the photon-counting rejection rule to
+heterodyne outcomes, substitute `Aₙ(z)/√π` for its branch amplitude. The
+common factor `1/π` cancels in the acceptance ratio, whose numerator retains
+the coherent sum. For distinct occupations, `Z=Σ|cₙ|²` by orthogonality, so the
+mean acceptance is `1/C²` for a unit-norm ket. For product Fock components,
+the overlaps factorise and the proposal draws each mode independently
+conditional on the selected component. See the
+[references for superposition rejection](@ref superposition-rejection-references).
+
+`NOON(N;phase)` uses two orthogonal product Fock components and has exactly
+1/2 acceptance at every N. Efficient sample generation does not imply low
+variance for high-order coherence estimators. The
+[Fock-basis examples](@ref fock-basis-examples) compare sampled moments
+with the exact coherence and apply the construction to Kerr evolution.
 
 `PhotonAddedCoherent(m,β)` uses the exact identity
 
@@ -112,7 +137,27 @@ separately normalised odd Fock series. Production sampling does not use these
 finite matrices. Tests use modest parameters with negligible tails and explicitly
 check normalisation; convergence checks compare multiple cutoffs.
 
-References for representation conventions and state statistics:
+### [References for superposition rejection](@id superposition-rejection-references)
+
+- In their 2026 preprint, Senellart, Wein and Emeriau give the `|cⱼ|/C`
+  proposal weights, the weighted Cauchy–Schwarz acceptance ratio and the mean
+  acceptance `1/C²` for a unit-norm state. Their components are linear-optical
+  branches and their outcomes are photon counts. [arXiv:2611.11044v1 (2026), Sec. 6](https://arxiv.org/html/2611.11044v1#S6).
+- Dias and König give a general rejection sampler for measurements of coherent
+  superpositions with weights proportional to `|cⱼ|²`. The construction
+  covers continuous measurements, including heterodyne detection.
+  Senellart et al. describe their absolute-weight rule as a specialisation
+  of this construction.
+  [arXiv:2501.17071v1 (2025), Lemma 3 and Corollary 2](https://arxiv.org/html/2501.17071v1).
+- Reid, Opanchuk, Rosales-Zárate and Drummond give a phase-space special
+  case in canonical positive-P. For an equal-amplitude superposition of
+  all-vacuum and one photon in each mode, the Q coordinate is proposed from
+  an equal mixture of the two product Fock Q laws with a rejection bound
+  of 2. Equal coefficient magnitudes give the same weights under both rules.
+  [Phys. Rev. A 90, 012111 (2014)](https://doi.org/10.1103/PhysRevA.90.012111),
+  [Sec. III.4, Eqs. (38)–(41)](https://arxiv.org/html/1406.2432#S3.SS4).
+
+### References for representation conventions and state statistics
 
 - [Olsen and Bradley (2009)](https://arxiv.org/abs/0906.3905), with the
   [thermal-state erratum (2016)](https://doi.org/10.1016/j.optcom.2016.02.068).
@@ -125,9 +170,8 @@ References for representation conventions and state statistics:
 - [Drummond and Opanchuk (2020)](https://doi.org/10.1103/PhysRevResearch.2.033304),
   for broader sampling and weighted methods. Weighted ordinary W is deferred.
 
-The rejection envelopes, small-odd proposal, binomial–Gamma positive-W law and
-collective-orbital construction are derived and verified here; no novelty claim
-is implied by their inclusion.
+The small-odd proposal, binomial–Gamma positive-W law and collective-orbital
+construction are derived and verified here, with no claim of novelty.
 
 ## Passive transformations and fixed-number condensates
 
@@ -217,7 +261,7 @@ GaussianBogoliubov
 PhotonAddedGaussian
 ```
 
-## Separate positive-W track
+## [Doubled positive-W sampling](@id positive-w-sampling)
 
 Generic `positiveW` convolves a valid positive-P pair with independent η=ξ/√2:
 `αW=αP+η`, `αWplus=αPplus+conj(η)`. This is an exact doubled representation.
@@ -232,6 +276,30 @@ Gamma(k+1,3/2) gives weights `binomial(n,k)(2/3)^k(1/3)^(n-k)`, summing to one.
 There is no finite rejection window or change of approximation at n=320.
 The exported Laguerre helpers and generic finite-window `reject` remain available
 for compatibility, and are not used by the default exact Fock positive-W path.
+
+The exact doubled sampler gives Weyl-ordered moments. For a Fock state,
+the real part of `αWplus*αW` has mean `n+1/2` and variance `2n+13/4`.
+To see the variance, write its real part as `X-abs2(γ)`. The Gamma mixture
+gives `Var(X)=2n+9/4`, and the independent unit circular noise gives
+`Var(abs2(γ))=1`.
+
+```@example positive_w_fock
+using PhaseSpaceTools, Random, Statistics
+
+rng = MersenneTwister(424)
+n = 3
+w, wplus = positiveW(rng, Fock(n), 100_000)
+R = wplus .* w
+
+(; occupation=mean(real.(R)) - 1/2, exact_occupation=n,
+   factorial=mean(real.(R.^2 .- 2R .+ 1/2)), exact_factorial=n*(n-1),
+   variance=var(real.(R)), exact_variance=2n+13/4)
+```
+
+Use the complex product in the Weyl polynomial before taking its real part.
+The variance above is for the real sampled product. The ordinary Wigner
+central moment of `|w|²` is a signed integral and equals `1/4` for a Fock
+state.
 
 For the canonical Q-derived construction the projection
 `μ=(α+conj(αplus))/2` has density `Q*G_(1/2)=W*G_1`, where

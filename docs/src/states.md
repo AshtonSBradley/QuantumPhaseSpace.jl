@@ -37,7 +37,9 @@ Bogoliubov
 different density matrix. Follow the [Q sampling tutorial](@ref cat-q-tutorial)
 for figures, runnable code and moment checks; the
 [finite-superposition machinery](exact-sampling.md) also covers sparse Fock
-states, NOON states and photon-added coherent states.
+states, NOON states and photon-added coherent states. The
+[Fock-basis examples](@ref fock-basis-examples) show how to check a
+number-state coherence and sample a Kerr-evolved state.
 
 ## Exact Q compositions and thermal operations
 

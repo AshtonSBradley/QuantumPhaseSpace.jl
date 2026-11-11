@@ -85,6 +85,13 @@ loss. All samplers accept an explicit RNG as their first argument. `sampleQ`
 always returns a modes × samples matrix; historical single-mode vectors and the
 legacy two-mode four-vector interfaces remain available.
 
+- [Kerr evolution](examples/kerr_evolution.jl) samples a coherent input at
+  collapse and revival times using finite Fock superpositions.
+- [Canonical thermal states](examples/canonical_thermal.jl) sample Gibbs
+  mixtures for Kerr, harmonic and displaced harmonic oscillators.
+- The [worked Fock-basis examples](docs/src/fock-basis.md) explain the
+  estimators and checks used in these examples.
+
 The [support table](docs/src/support.md) distinguishes exact laws, explicit
 approximations and unsupported methods. Positive-W is a doubled representation,
 with generally correlated nonconjugate coordinates, and is not ordinary W.
