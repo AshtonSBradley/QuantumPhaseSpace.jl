@@ -1,6 +1,6 @@
 module CatQShowcase
 
-using PhaseSpaceTools, CairoMakie, Random, Statistics
+using QuantumPhaseSpace, CairoMakie, Random, Statistics
 
 # Independent analytic densities, used only for figure contours and validation.
 coherent_overlap(z,α) = exp(-abs2(z-α)/2+im*imag(conj(z)*α))

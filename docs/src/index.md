@@ -18,17 +18,19 @@ machinery for number-state coherences, coherent input evolved under a Kerr
 Hamiltonian, and canonical thermal ensembles. The [support table](support.md)
 lists the available samplers for each state.
 
+The [fermionic truncated-Wigner initializers](@ref fermionic-twa) cover Slater
+determinants and free thermal states.
+
 # Installation
-In the julia REPL
 
-```julia-repl
-julia> ]add PhaseSpaceTools
-
-julia> ]test PhaseSpaceTools
+```julia
+using Pkg
+Pkg.add(url="https://github.com/AshtonSBradley/QuantumPhaseSpace.jl")
 ```
+
 # References
-Cite [PhaseSpaceTools.jl](https://doi.org/10.5281/zenodo.3758700) for the
-software. For the original sampling prescriptions, see
+The [PhaseSpaceTools.jl archive](https://doi.org/10.5281/zenodo.3758700) records the predecessor package.
+For the original sampling prescriptions, see
 
 M. K. Olsen, A. S. Bradley, Numerical representation of quantum states in the positive-P and Wigner representations, [Optics Communications __282__, 3924-3929 (2009).](https://dx.doi.org/10.1016/j.optcom.2009.06.033)
 

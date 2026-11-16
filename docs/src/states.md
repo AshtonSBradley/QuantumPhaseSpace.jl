@@ -1,5 +1,5 @@
 # Quantum states
-Quantum states available in `PhaseSpaceTools.jl` are
+Quantum states available in `QuantumPhaseSpace.jl` are
 
 ## Coherent
 ```@docs

@@ -50,23 +50,14 @@ acceptance `[1+exp(-2|α|²)cosφ]/2`. Exact parity arithmetic avoids a spurious
 `sin(π)` phase. Even cats have acceptance at least one half. General phases
 close to destructive cancellation may have very low acceptance.
 
-For an odd cat, let `A=|α|²>0`, `t=conj(α)z`. The alternate proposal is
-`q(z)=|z|² exp(-|z|²/2)/(4π)`, obtained from `|z|²~Gamma(2,2)` and uniform phase.
-Its rejection probability is
-
-```math
-p(z)=e^{-|z|^2/2-2A}\left|\frac{\sinh t}{t}\right|^2.
-```
-
-To verify the envelope independently, use
-`sinh(t)/t=∫₀¹cosh(st)ds`, so `|sinh(t)/t|≤exp(|t|)`. Hence
-`log p≤-|z|²/2-2A+2√A|z|=-(|z|-2√A)²/2≤0`.
-Multiplying `q p` gives
-`exp(-|z|²-2A)|sinh t|²/(4πA)`. Comparing with the normalised odd-cat Q
-function yields mean acceptance `(1-exp(-2A))exp(-A)/(8A)`, tending to 1/4.
-The implementation selects whichever exact proposal has higher expected
-acceptance and evaluates `sinh(t)/t` by analytic continuation near zero.
-`OddCat(0)` raises an error; `Fock(1)` is an explicit limiting choice.
+For an odd cat, let A=|α|², t=conj(α)z and λ=1-A/3. When 0<A<3,
+the alternate proposal draws |z|² from Gamma(2,1/λ) and an independent uniform
+phase. Its rejection probability is exp(-A|z|²/3)|sinh(t)/t|².
+The bound |sinh(t)/t|≤exp(|t|²/6) follows term by term from
+(2k+1)!≥6^k k!. The mean acceptance is λ² sinh(A)/A and tends to one
+as α approaches zero. The code selects the proposal with higher expected
+acceptance and evaluates sinh(t)/t by analytic continuation near zero.
+OddCat(0) raises an error. Fock(1) samples the limiting state explicitly.
 
 ## [Finite expansions and multimode applications](@id finite-fock-superpositions)
 
@@ -284,7 +275,7 @@ gives `Var(X)=2n+9/4`, and the independent unit circular noise gives
 `Var(abs2(γ))=1`.
 
 ```@example positive_w_fock
-using PhaseSpaceTools, Random, Statistics
+using QuantumPhaseSpace, Random, Statistics
 
 rng = MersenneTwister(424)
 n = 3

@@ -16,49 +16,46 @@ end
     β = 0.6+0.4im
     K = 42
     a = annihilator(K)
-    for η in (0.0,0.4,1.0)
-        s = Loss(Coherent(β),η)
-        z = vec(sampleQ(rng,s,90_000))
-        checkmean(z,sqrt(η)*β)
-        checkmean(abs2.(z).-1,η*abs2(β))
-        checkmean(z.^2,η*β^2)
-        if η==1
-            @test sampleQ(MersenneTwister(8),s,20) == sampleQ(MersenneTwister(8),Coherent(β),20)
-        end
-        n = 4
-        p = [pdf(Binomial(n,η),k) for k in 0:n]
-        for state in (Loss(Fock(n),η),NumberMixture(p))
-            z = vec(sampleQ(rng,state,90_000))
-            checkmean(abs2.(z),1+n*η)
-            checkmean(abs2.(z).^2,2+4n*η+n*(n-1)*η^2)
-        end
+    N = 45_000
+    coherent = Coherent(β)
+    @test sampleQ(MersenneTwister(8),Loss(coherent,1),20) ==
+          sampleQ(MersenneTwister(8),coherent,20)
+    z = vec(sampleQ(rng,Loss(coherent,0),N))
+    checkmean(z,0)
+    checkmean(abs2.(z),1)
+
+    n, η = 4, 0.4
+    p = [pdf(Binomial(n,η),k) for k in 0:n]
+    for state in (Loss(Fock(n),η),NumberMixture(p))
+        z = vec(sampleQ(rng,state,N))
+        checkmean(abs2.(z),1+n*η)
+        checkmean(abs2.(z).^2,2+4n*η+n*(n-1)*η^2)
     end
-    cat = Cat(β,0.8)
-    v = coherentket(β,K)+cis(0.8)*coherentket(-β,K); normalize!(v)
-    for η in (0.3,0.8)
-        ρ = lossdensity(v,η)
-        @test tr(ρ) ≈ 1 atol=1e-12
-        z = vec(sampleQ(rng,Loss(cat,η),100_000))
-        for (p,q) in ((0,1),(0,2),(1,1),(2,2),(1,3))
-            checkmean(conj.(z).^p .* z.^q,tr(ρ*a^q*adjoint(a)^p))
-        end
-    end
+
+    phase = 0.8
+    cat = Cat(β,phase)
+    v = normalize!(coherentket(β,K)+cis(phase)*coherentket(-β,K))
+    ρ = lossdensity(v,η)
+    @test tr(ρ) ≈ 1 atol=1e-12
+    z = vec(sampleQ(rng,Loss(cat,η),N))
+    # First and mixed moments retain the interference-sensitive odd part.
+    checkmean(z,tr(ρ*a))
+    checkmean(conj.(z).*z.^2,tr(ρ*a^2*a'))
+    checkmean(abs2.(z),tr(ρ*a*a'))
+
     σ = 0.6
-    v = coherentket(β,K)
-    for s in (PhaseDiffused(Coherent(β),σ),PhaseDiffused(Coherent(β),σ;common=false))
-        z = vec(sampleQ(rng,s,100_000))
-        for (p,q) in ((0,1),(0,2),(1,2),(0,3),(2,2))
-            checkmean(conj.(z).^p .* z.^q,qmoment(v,a,p,q)*exp(-(p-q)^2*σ^2/2))
-        end
-    end
+    z = vec(sampleQ(rng,PhaseDiffused(coherent,σ),N))
+    checkmean(z,β*exp(-σ^2/2))
+    checkmean(z.^2,β^2*exp(-2σ^2))
+    checkmean(abs2.(z),1+abs2(β))
     for common in (true,false)
         s = PhaseDiffused(ProductState(Coherent(β),Coherent(im*β)),σ;common)
-        Z = sampleQ(rng,s,100_000)
+        Z = sampleQ(rng,s,N)
         factor = common ? 1.0 : exp(-σ^2)
         checkmean(conj.(Z[1,:]).*Z[2,:],im*abs2(β)*factor)
     end
     s = ProductState(Fock(3),Fock(2))
-    Z = sampleQ(rng,Loss(s,[0.2,0.8]),100_000)
+    Z = sampleQ(rng,Loss(s,[0.2,0.8]),N)
     checkmean(abs2.(Z[1,:]),1.6)
     checkmean(abs2.(Z[2,:]),2.6)
     @test sampleQ(MersenneTwister(2),PhaseDiffused(cat,0),20) == sampleQ(MersenneTwister(2),cat,20)

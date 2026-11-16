@@ -1,4 +1,4 @@
-module PhaseSpaceTools
+module QuantumPhaseSpace
 
 using Reexport
 using Random
@@ -21,6 +21,7 @@ export Passive, FixedNumberCondensate
 export Loss, PhaseDiffused
 export Gaussian, SqueezedThermal, TwoModeSqueezedThermal, GaussianBogoliubov, PhotonAddedGaussian
 export State, Coherent, Squeezed, SqueezedTwoMode, Fock, Thermal, Crescent, Bogoliubov
+export SlaterDeterminant, FermionThermal
 export glauberP, husimiQ, wigner, positiveP, positiveW
 export randnc, realnoise, realbridge
 export reject, plaguerre, plaguerre_asymptotic, laguerren
@@ -36,5 +37,6 @@ include("multimode.jl")
 include("channels.jl")
 include("gaussian.jl")
 include("positivew.jl")
+include("fermions.jl")
 
 end  

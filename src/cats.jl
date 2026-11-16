@@ -2,7 +2,7 @@
     Cat(α, phase=0)
 
 Normalised `|α⟩+exp(i phase)|-α⟩`. Exact Gaussian rejection is used, except
-small odd cats use the separately bounded Gamma proposal. `OddCat(0)` is
+small odd cats use a Gamma proposal with acceptance tending to one. `OddCat(0)` is
 undefined; request `Fock(1)` explicitly for its limiting state. General phases
 near destructive cancellation can be inefficient: inspect `sampleQ` diagnostics.
 """
@@ -47,27 +47,43 @@ end
 function _catrates(s)
     A = abs2(s.α)
     direct = s.D/2
-    small = s.parity == -1 && A>0 ? (-expm1(-2A)/(8A))*exp(-A) : 0.0
+    small = s.parity == -1 && 0<A<3 ? (1-A/3)^2 * (s.D/A) * exp(A)/2 : 0.0
     return direct,small
 end
 function _qfill!(rng,Z,s::Cat,d,limit)
     direct,small = _catrates(s)
-    alternate = small>direct
     A = abs2(s.α)
+    if small > direct
+        return _qfill_odd_gamma!(rng,Z,s,d,limit,A/3,0.0)
+    end
+    return _qfill_cat_gaussian!(rng,Z,s,d,limit)
+end
+
+function _qfill_odd_gamma!(rng,Z,s::Cat,d,limit,broadening,offset)
+    radial = Gamma(2,inv(1-broadening))
     while d.accepted<size(Z,2)
         _proposal!(d,limit)
-        if alternate
-            z = sqrt(rand(rng,Gamma(2,2)))*cis(2π*rand(rng))
-            t = conj(s.α)*z
-            p = exp(-abs2(z)/2-2A+2real(_logsinhc(t)))
-        else
-            z = (rand(rng,Bool) ? s.α : -s.α)+randnc(rng)
-            t = conj(s.α)*z
-            e = exp(-2abs(real(t)))
-            sech = 2e/(1+e^2)
-            interference = s.parity == 1 ? cos(2imag(t)) : s.parity == -1 ? -cos(2imag(t)) : cos(2imag(t)+s.phase)
-            p = (1+interference*sech)/2
+        B = rand(rng,radial)
+        z = sqrt(B)*cis(2π*rand(rng))
+        t = conj(s.α)*z
+        p = exp(-broadening*B-offset+2real(_logsinhc(t)))
+        if rand(rng)<_acceptprob(p)
+            d.accepted += 1
+            Z[1,d.accepted] = z
         end
+    end
+    return Z
+end
+
+function _qfill_cat_gaussian!(rng,Z,s::Cat,d,limit)
+    while d.accepted<size(Z,2)
+        _proposal!(d,limit)
+        z = (rand(rng,Bool) ? s.α : -s.α)+randnc(rng)
+        t = conj(s.α)*z
+        e = exp(-2abs(real(t)))
+        sech = 2e/(1+e^2)
+        interference = s.parity == 1 ? cos(2imag(t)) : s.parity == -1 ? -cos(2imag(t)) : cos(2imag(t)+s.phase)
+        p = (1+interference*sech)/2
         if rand(rng)<_acceptprob(p)
             d.accepted += 1
             Z[1,d.accepted] = z

@@ -1,4 +1,4 @@
-using PhaseSpaceTools, Random, Statistics
+using QuantumPhaseSpace, Random, Statistics
 
 """Run the exact-state examples with a reproducible RNG and return the samples."""
 function exact_sampling_examples(;N=10_000,rng=MersenneTwister(20261110))

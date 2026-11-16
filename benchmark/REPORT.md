@@ -42,7 +42,7 @@ N=100,000. P denotes positive-P; W+ denotes doubled positive-W. All exact reject
 - The collective-mode specialised positive-P sampler reduces mode-1 occupation variance by 45.1× relative to generic Q conversion, and the measured variance–time cost by 235.4× for this N=30, M=16 example. Its zero orthogonal positive-P vacuum is physically valid; no trajectory norm is fixed.
 - Thermal specialised positive-P reduces occupation variance by 1.84× and the measured variance–time cost by 2.88× in this displaced nbar=3 case.
 - Direct Fock positive-W uses about six times fewer allocated bytes than convolution in these batches. Convolution is faster in the measured cases, especially at high n; their estimator variances agree within sampling uncertainty. The exact direct law is the default to remove the old spatial-window and asymptotic approximations, not because it wins every runtime comparison.
-- Small odd-cat acceptance is approximately 1/4 even at |α|=0.0001. Even-cat, photon-added coherent and NOON acceptance agree with their analytic expectations. Photon-added coherent preparation includes a small exact finite Gram problem; no coherent-state truncation is hidden.
+- In this archived benchmark, the broader Gamma proposal for small odd cats gives acceptance approximately 1/4 even at |α|=0.0001. Even-cat, photon-added coherent and NOON acceptance agree with their analytic expectations. Photon-added coherent preparation includes a small exact finite Gram problem; no coherent-state truncation is hidden.
 
 ## Batch-size scaling
 

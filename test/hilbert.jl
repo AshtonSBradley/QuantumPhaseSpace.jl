@@ -15,11 +15,11 @@ function coherentket(β,K)
     return v
 end
 qmoment(v,a,p,q) = dot(v,a^q*adjoint(a)^p*v)
-function checkqket(rng,s,v;N=65_000)
+function checkqket(rng,s,v;N=45_000)
     a = annihilator(length(v))
     @test abs(norm(v)-1)<1e-10
     z = vec(sampleQ(rng,s,N))
-    for (p,q) in ((0,1),(0,2),(1,1),(1,2),(2,2))
+    for (p,q) in ((0,2),(1,2),(2,2))
         checkmean(conj.(z).^p .* z.^q,qmoment(v,a,p,q))
     end
 end

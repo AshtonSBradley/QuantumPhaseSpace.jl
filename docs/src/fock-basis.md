@@ -18,7 +18,7 @@ and positive-P, so both ensembles can estimate this moment directly.
 The standard errors below refer to the real and imaginary components.
 
 ```@example fock_superposition
-using PhaseSpaceTools, Random, Statistics
+using QuantumPhaseSpace, Random, Statistics
 
 rng = MersenneTwister(421)
 phase = π/3
@@ -60,7 +60,7 @@ $\tau=2\pi/3$, $\langle a^3\rangle=\beta^3$, while
 $|\langle a\rangle/\beta|=e^{-3\nu/2}$.
 
 ```@example kerr_snapshot
-using PhaseSpaceTools, Random, Statistics
+using QuantumPhaseSpace, Random, Statistics
 
 rng = MersenneTwister(422)
 β = 2cis(0.35)
@@ -109,7 +109,7 @@ the geometric probabilities of [`Thermal`](@ref), which describes a harmonic
 mode.
 
 ```@example canonical_thermal
-using PhaseSpaceTools, Random, Statistics
+using QuantumPhaseSpace, Random, Statistics
 
 rng = MersenneTwister(423)
 n = 0:35

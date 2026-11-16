@@ -1,4 +1,4 @@
-The PhaseSpaceTools.jl package is licensed under the MIT "Expat" License:
+The QuantumPhaseSpace.jl package is licensed under the MIT "Expat" License:
 
 > Copyright (c) 2018: Ashton Bradley.
 >

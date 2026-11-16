@@ -1,12 +1,14 @@
-# PhaseSpaceTools
+# QuantumPhaseSpace
 
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://AshtonSBradley.github.io/PhaseSpaceTools.jl/dev)
-[![Build Status](https://github.com/AshtonSBradley/PhaseSpaceTools.jl/workflows/CI/badge.svg)](https://github.com/AshtonSBradley/PhaseSpaceTools.jl/actions)
-[![Aqua](https://github.com/AshtonSBradley/PhaseSpaceTools.jl/actions/workflows/Aqua.yml/badge.svg)](https://github.com/AshtonSBradley/PhaseSpaceTools.jl/actions/workflows/Aqua.yml)
-[![Coverage](https://codecov.io/gh/AshtonSBradley/PhaseSpaceTools.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/AshtonSBradley/PhaseSpaceTools.jl)
-[![DOI](https://zenodo.org/badge/115932136.svg)](https://zenodo.org/badge/latestdoi/115932136)
+[![Build Status](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/workflows/CI/badge.svg)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions)
+[![Aqua](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml/badge.svg)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml)
 
-Sample quantum initial states commonly encountered in quantum phase space simulations of Bose fields, including those encountered in quantum optics and Bose-Einstein condensates. 
+Sample initial states for bosonic and fermionic quantum phase-space simulations.
+The bosonic samplers cover quantum optics and Bose fields. The fermionic samplers
+provide initial bilinear ensembles for truncated Wigner calculations.
+
+QuantumPhaseSpace.jl succeeds [PhaseSpaceTools.jl](https://github.com/AshtonSBradley/PhaseSpaceTools.jl).
+See the [documentation](docs/src/index.md) for usage and representation conventions.
 
 Exact Husimi-Q and positive-P sampling includes cats, finite quantum superpositions, photon-added states and multimode initial conditions. Ordinary Wigner sampling is available for the states listed in the support table.
 
@@ -20,13 +22,14 @@ components at ±α. [Explore the cat-state Q tutorial](docs/src/cat-q.md).
 ## Install
 
 ```julia
-julia> ]add PhaseSpaceTools
+using Pkg
+Pkg.add(url="https://github.com/AshtonSBradley/QuantumPhaseSpace.jl")
 ```
 
 ## Quick Start
 
 ```julia
-using PhaseSpaceTools, Random
+using QuantumPhaseSpace, Random
 
 rng = MersenneTwister(42)
 α = 1.2 + 0im
@@ -91,6 +94,8 @@ legacy two-mode four-vector interfaces remain available.
   mixtures for Kerr, harmonic and displaced harmonic oscillators.
 - The [worked Fock-basis examples](docs/src/fock-basis.md) explain the
   estimators and checks used in these examples.
+- [Fermionic truncated Wigner](docs/src/fermions.md) initializes bilinear
+  trajectories for Slater determinants and free thermal fermions.
 
 The [support table](docs/src/support.md) distinguishes exact laws, explicit
 approximations and unsupported methods. Positive-W is a doubled representation,

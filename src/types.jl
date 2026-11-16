@@ -1,7 +1,7 @@
 """
     State
 
-Abstract supertype for all sampled states: `state <: State`.
+Abstract supertype for sampled bosonic states.
 
 Ordinary phase-plane samplers return conjugate coordinate vectors. Doubled
 positive-P and positive-W coordinates are generally correlated, and need not

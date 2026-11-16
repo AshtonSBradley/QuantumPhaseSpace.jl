@@ -1,4 +1,4 @@
-using PhaseSpaceTools, Random, Statistics, LinearAlgebra, Printf
+using QuantumPhaseSpace, Random, Statistics, LinearAlgebra, Printf
 
 # Base.@timed, warmed callbacks, median of five runs. Sampling time includes
 # output allocation; variance and estimator evaluation are outside the timer.

@@ -1,5 +1,8 @@
 # State and representation support
 
+This table covers bosonic states. See [fermionic truncated Wigner](@ref fermionic-twa)
+for the Slater and free-thermal initializers.
+
 **E**: exact probability law, subject to floating-point accuracy. **A**: explicit
 large-occupation approximation. **C**: exact only for classical covariance
 `V-I/2≥0`, otherwise an informative error. **—**: no public method supplied.
@@ -70,7 +73,7 @@ products, photon subtraction, compass and sparse-code sums, squeezed cats,
 passive mixing, and the general Gaussian constructors. For example:
 
 ```julia
-using PhaseSpaceTools, Random
+using QuantumPhaseSpace, Random
 rng = MersenneTwister(12)
 cat = EvenCat(1.2+0.4im)
 Z, stats = sampleQ(rng, Loss(cat,0.65),10_000;diagnostics=true)

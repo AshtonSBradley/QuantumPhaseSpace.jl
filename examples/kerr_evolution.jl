@@ -1,4 +1,4 @@
-using PhaseSpaceTools: FockSuperposition, sampleQ, positiveP, acceptance_rate
+using QuantumPhaseSpace: FockSuperposition, sampleQ, positiveP, acceptance_rate
 using Distributions: Poisson, pdf, quantile, ccdf
 using LinearAlgebra: diagm, dot, norm
 using Random: MersenneTwister

@@ -114,7 +114,7 @@ claim that a modest sample histogram resolves the very weak central fringes.
 Choose the coherent amplitude, state and an explicit RNG:
 
 ```@example cat_q
-using PhaseSpaceTools, Random, Statistics
+using QuantumPhaseSpace, Random, Statistics
 
 rng = MersenneTwister(42)
 α = 1.2 + 0im
@@ -292,7 +292,7 @@ loss_target = η * A * tanh(A)
 As α approaches zero, the odd cat approaches the one-photon state. Its direct
 Gaussian proposal becomes inefficient, so the implementation selects a different
 exact proposal when it has better expected acceptance. That acceptance tends
-to 1/4. A small finite cat retains its exact finite amplitude:
+to one. A small finite cat retains its exact finite amplitude:
 
 ```@example cat_q
 small_odd = OddCat(0.05)

@@ -1,4 +1,4 @@
-using PhaseSpaceTools: FockSuperposition, Mixture, NumberMixture, sampleQ, positiveP
+using QuantumPhaseSpace: FockSuperposition, Mixture, NumberMixture, sampleQ, positiveP
 using LinearAlgebra: Diagonal, Hermitian, I, diag, diagm, eigen, isdiag, ishermitian, tr
 using Random: MersenneTwister
 using Statistics: mean, std

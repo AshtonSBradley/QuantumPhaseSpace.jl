@@ -1,7 +1,7 @@
-name = "PhaseSpaceTools"
-uuid = "0e21426a-da0a-11e8-1f13-43a2532b2fa8"
+name = "QuantumPhaseSpace"
+uuid = "40b39e08-9a2f-4c54-9c4d-5d5f39b2c89f"
 authors = ["Ashton Bradley <ashton.bradley@gmail.com>"]
-version = "1.0.7"
+version = "2.0.0"
 
 [deps]
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"

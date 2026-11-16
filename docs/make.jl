@@ -1,6 +1,6 @@
-using Documenter, PhaseSpaceTools
+using Documenter, QuantumPhaseSpace
 
-makedocs(sitename="PhaseSpaceTools.jl",
+makedocs(sitename="QuantumPhaseSpace.jl",
 pages = [
 "Overview" => "index.md",
 "Introduction to Phase Space" => "phasespace.md",
@@ -9,18 +9,10 @@ pages = [
 "Exact Q Sampling" => "exact-sampling.md",
 "Example: Cat States" => "cat-q.md",
 "Examples: Fock-Basis States" => "fock-basis.md",
+"Fermionic Truncated Wigner" => "fermions.md",
 "Support and Examples" => "support.md",
 "Solving SDES" => "sdes.md"
 ],
 format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true")
 )
-
-if get(ENV,"CI","false")=="true"
-deploydocs(
-    repo = "github.com/AshtonSBradley/PhaseSpaceTools.jl.git",
-    devbranch = "master"                  # match your default branch
-)
-
-
-end
