@@ -1,4 +1,4 @@
-# Codex directive: PhaseSpaceTools.jl sampling development
+# PhaseSpaceTools.jl sampling development plan
 
 ## Objective
 
@@ -513,7 +513,7 @@ No production sampler should rely on an undocumented finite spatial window, sile
 - Examples for a cat, photon-added thermal state, photon-added coherent state, NOON state, fixed-N condensate and lossy cat.
 - A benchmark report including estimator variance, not only generation speed.
 - A concise change report: completed stages, validation results, API decisions, remaining limitations and deferred research.
-- A progress record in the repository so a later Codex session can resume without repeating finished work.
+- A progress record in the repository so later work can resume from the recorded progress.
 
 ## Sources and derivation status
 

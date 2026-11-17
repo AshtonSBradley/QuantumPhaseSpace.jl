@@ -13,6 +13,10 @@ glauberP
 ```@docs
 positiveP
 ```
+
+[Direct Gaussian positive-P sampling](@ref direct-gaussian-positive-p) explains
+`method=:drummond` and its two-mode squeezing convention.
+
 ## Wigner
 ```@docs
 wigner

@@ -29,15 +29,22 @@ function husimiQ(rng::AbstractRNG,state::Coherent,N)
 end
 
 """
-    α,α⁺ = positiveP(state <: State,N)
+    α,α⁺ = positiveP([rng], state, N)
 
 Generate `N` samples from the positive-P (+P) phase-space distribution for `state`.
 
 Moments of the +P distribution generate quantum operator averages that are normally ordered.
 
-The doubled coordinates α,α⁺ need not be conjugates and are generally correlated. 
+The doubled coordinates α,α⁺ need not be conjugates and are generally correlated.
+
+For `Gaussian`, `Squeezed`, `SqueezedTwoMode` and `Bogoliubov`, select
+`method=:drummond` to minimise mean-square nonconjugacy at initialisation.
+`method=:canonical` (the default for these types) uses Husimi-Q conversion.
+`SqueezedTwoMode` returns four vectors in the order `(α₁, α₁⁺, α₂, α₂⁺)`.
 """
-function positiveP(rng::AbstractRNG,state::State,N)
+positiveP(rng::AbstractRNG,state::State,N) = _canonical_positiveP(rng,state,N)
+
+function _canonical_positiveP(rng,state,N)
     N = _samplecount(N)
     μ = sampleQ(rng,state,N)
     γ = randnc(rng,size(μ)...)
@@ -109,7 +116,7 @@ function husimiQ(rng::AbstractRNG,state::SqueezedTwoMode,N)
     return α, α⁺, β, β⁺
 end
 
-function positiveP(rng::AbstractRNG,state::SqueezedTwoMode,N)
+function _canonical_positiveP(rng,state::SqueezedTwoMode,N)
     N = _samplecount(N)
     μa,μa⁺,μb,μb⁺ = husimiQ(rng,state,N)
     γa = randnc(rng,N)

@@ -1,7 +1,6 @@
 # Sampling development progress
 
-Directive: `PhaseSpaceTools_codex_directive.md`, supplied 10 November 2026.
-Development branch: `codex/exact-quantum-sampling`. Starting revision:
+The sampling development plan was supplied on 10 November 2026. Starting revision:
 `b180b50f0eddfed02d2f19728c6cbb5d15865b36` (v1.0.7).
 No repository-specific AGENTS.md exists. Global Julia protections apply.
 

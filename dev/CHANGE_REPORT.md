@@ -1,6 +1,6 @@
 # Quantum-state sampling change report
 
-Implemented on `codex/exact-quantum-sampling`, starting at
+Sampling development started at
 `b180b50f0eddfed02d2f19728c6cbb5d15865b36` (v1.0.7). Release version, default
 Julia channel and existing Julia installations are unchanged. No merge, push,
 release or publication was performed.

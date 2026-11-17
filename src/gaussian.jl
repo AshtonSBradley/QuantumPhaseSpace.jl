@@ -13,7 +13,8 @@ Multimode Gaussian state with complex displacement vector β and real symmetric
 quadrature covariance V, ordered `(x₁,p₁,x₂,p₂,...)`. Here `a=(x+ip)/√2`,
 `[x,p]=i`, and `V[j,k]=⟨{δR[j],δR[k]}⟩/2`, so vacuum has `V=I/2`.
 Validates `V+iΩ/2 ≥ 0` and caches W/Q/P factors. Ordinary P is available only
-when `V-I/2 ≥ 0`, including semidefinite limits; positive-P always uses Q conversion.
+when `V-I/2 ≥ 0`, including semidefinite limits. Positive-P supports
+`method=:drummond` for direct Gaussian sampling and `method=:canonical` for Q conversion.
 """
 struct Gaussian <: State
     β::Vector{ComplexF64}
@@ -70,6 +71,46 @@ function glauberP(rng::AbstractRNG,s::Gaussian,N)
     Z = Matrix{ComplexF64}(undef,nmodes(s),N)
     _gaussianfill!(rng,Z,s,s.pfactor)
     return _legacy(s,Z,conj.(Z))
+end
+
+# The covariance of the complex quadratures is L * transpose(L).
+# Negative eigenvalues contribute purely imaginary noise.
+function _normal_covfactor(C)
+    E = eigen(Symmetric(C))
+    return E.vectors * Diagonal(sqrt.(complex.(E.values)))
+end
+
+function positiveP(rng::AbstractRNG,s::Union{Gaussian,Squeezed,SqueezedTwoMode,Bogoliubov},N;
+                   method=:canonical)
+    method === :canonical && return _canonical_positiveP(rng,s,N)
+    method === :drummond || throw(ArgumentError("Gaussian positiveP method must be :canonical or :drummond."))
+
+    N = _samplecount(N)
+    M = nmodes(s)
+    A = Matrix{ComplexF64}(undef,M,N)
+    B = similar(A)
+    if N > 0
+        _drummond_fill!(rng,A,B,s isa Gaussian ? s : Gaussian(s))
+    end
+    return _legacy(s,A,B)
+end
+
+function _drummond_fill!(rng,A,B,g::Gaussian)
+    M = nmodes(g)
+    L = _normal_covfactor(g.V-I/2)
+    ξ = Vector{Float64}(undef,2M)
+    z = Vector{ComplexF64}(undef,2M)
+    invsqrt2 = inv(sqrt(2.0))
+    for col in axes(A,2)
+        randn!(rng,ξ)
+        mul!(z,L,ξ)
+        for m in 1:M
+            x,ip = z[2m-1],im*z[2m]
+            A[m,col] = g.β[m] + invsqrt2*(x+ip)
+            B[m,col] = conj(g.β[m]) + invsqrt2*(x-ip)
+        end
+    end
+    return A,B
 end
 
 """`D(β) S(ϵ) ρthermal(nbar) S(ϵ)† D(β)†`, using the single-mode squeezing convention."""

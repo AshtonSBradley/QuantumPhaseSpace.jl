@@ -1,6 +1,6 @@
 # Cat-Q documentation and figure validation
 
-Completed 10 November 2026 on `codex/exact-quantum-sampling`.
+Completed 10 November 2026.
 
 ## Delivered
 

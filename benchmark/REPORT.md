@@ -1,6 +1,6 @@
 # Sampling benchmark report
 
-Measured 10 November 2026 on Apple M4 Pro (aarch64 macOS), Julia 1.13.3, one Julia thread, Float64. Source: development branch `codex/exact-quantum-sampling` after stages 0–6 and Wplus. No GPU was used. Measured package versions: Distributions 0.25.134, GSL 1.0.1, Parameters 0.12.3, SpecialFunctions 2.9.1.
+Measured 10 November 2026 on Apple M4 Pro (aarch64 macOS), Julia 1.13.3, one Julia thread, Float64. Source: sampling implementation after stages 0–6 and Wplus. No GPU was used. Measured package versions: Distributions 0.25.134, GSL 1.0.1, Parameters 0.12.3, SpecialFunctions 2.9.1.
 
 ## Method
 
@@ -89,3 +89,61 @@ run_sampling_benchmarks()
 ```
 
 The complete inspectable measurements are in [`results.tsv`](results.tsv). The runnable state examples are in [`../examples/exact_sampling.jl`](../examples/exact_sampling.jl).
+
+## Direct Gaussian positive-P for two-mode squeezing
+
+Run `julia --project=. benchmark/gaussian_positive_p.jl` to reproduce the
+comparison of `positiveP(rng,SqueezedTwoMode(r,0),N;method)` for
+`:canonical` and `:drummond`. Measured on Apple M4 Pro, Julia 1.13.2,
+one Julia thread, Float64. Times are medians of nine warmed calls at
+N=200,000, including output allocation. RNG creation and a garbage
+collection occur before each timed call. Estimator standard errors are measured on a separate batch of the
+same size. D is the mean of the two modewise values of
+`E|α-conj(α⁺)|²`. The benchmark prints both modewise values and both
+occupation estimates.
+
+Each SE cell gives real / imaginary standard errors. The exact number-difference
+variance is zero in the squeezed vacuum. Its trajectory estimator with the
+normal-ordering correction is `(n₁-n₂)^2+n₁+n₂`. Its imaginary component,
+and that of `ab`, vanish to roundoff for the direct sampler at phase zero.
+
+| r | Method | D | SE of ⟨n₁⟩ | SE of ⟨ab⟩ | SE of Var(n₁−n₂) | ms | Bytes/sample |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | Canonical | 4.00 | .00316 / .00316 | .00317 / .00316 | .0224 / .0223 | 5.36 | 225 |
+| 0 | Drummond | 0 | 0 / 0 | 0 / 0 | 0 / 0 | 8.17 | 128 |
+| 0.5 | Canonical | 4.00 | .00362 / .00357 | .00372 / .00347 | .0274 / .0273 | 5.16 | 225 |
+| 0.5 | Drummond | .634 | .00102 / .000822 | .00131 / <1e−14 | .00292 / <1e−14 | 8.03 | 128 |
+| 1 | Canonical | 4.00 | .00579 / .00488 | .00609 / .00452 | .0487 / .0473 | 5.32 | 225 |
+| 1 | Drummond | .867 | .00360 / .00185 | .00406 / <1e−14 | .0128 / <1e−14 | 8.03 | 128 |
+| 2 | Canonical | 4.00 | .0319 / .0119 | .0324 / .0105 | .282 / .258 | 5.21 | 225 |
+| 2 | Drummond | .984 | .0299 / .00571 | .0305 / <1e−14 | .117 / <1e−14 | 8.06 | 128 |
+| 3 | Canonical | 4.00 | .228 / .0319 | .228 / .0277 | 2.02 / 1.81 | 5.24 | 225 |
+| 3 | Drummond | 1.00 | .225 / .0158 | .225 / <1e−14 | .907 / <1e−14 | 8.14 | 128 |
+
+At r=0.5 the direct sampler cut the real estimator variances for occupation,
+anomalous correlation and number-difference variance by factors of about
+12.5, 8.0 and 88, respectively. The factors at r=2 were 1.14, 1.13 and 5.8.
+The direct sampler took about 1.5 times as long to draw this batch and
+allocated 43% fewer bytes. These timings cover initial-state
+sampling only.
+
+High-order convergence was measured as relative complex RMSE over 32
+independent batches for each method. The exact values for the normally
+ordered occupation estimator `(α⁺α)^4` and the pair estimators
+`(α₁α₂)^k` are `4! sinh(r)^8` and `k! (sinh(r)cosh(r))^k`,
+respectively. Each cell gives canonical / Drummond RMSE.
+
+| r | N | ⟨(a†)^4 a^4⟩ | ⟨(ab)^4⟩ | ⟨(ab)^6⟩ |
+| ---: | ---: | ---: | ---: | ---: |
+| 0.5 | 1,000 | 171 / 1.20 | 10.4 / .190 | 162 / .419 |
+| 0.5 | 10,000 | 59.9 / .532 | 4.05 / .0800 | 161 / .249 |
+| 0.5 | 100,000 | 15.6 / .176 | 1.06 / .0244 | 18.7 / .0936 |
+| 2 | 1,000 | .340 / .206 | .268 / .185 | .815 / .399 |
+| 2 | 10,000 | .103 / .0822 | .114 / .0716 | .766 / .206 |
+| 2 | 100,000 | .0346 / .0261 | .0296 / .0264 | .120 / .0830 |
+
+High-order errors vary across finite batches because rare, large polynomial
+values contribute strongly. Strong squeezing also requires subtracting
+large contributions when estimating a small number-difference variance.
+The sampler operates on Float64 covariances and the comparison covers
+initial states only.

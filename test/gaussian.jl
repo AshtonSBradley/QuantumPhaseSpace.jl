@@ -86,3 +86,119 @@ end
     @test_throws ArgumentError PhotonAddedGaussian(TwoModeSqueezedThermal(0.2,0),1)
     @test_throws ArgumentError PhotonAddedGaussian(Gaussian(Coherent(0)),-1)
 end
+
+@testset "Direct Gaussian positive-P" begin
+    rng = MersenneTwister(608)
+    N = 60_000
+    vacuum = Gaussian(Coherent(0))
+    thermal = Gaussian(Thermal(0.4+0.2im,1.3))
+    legacy = SqueezedTwoMode(0.5,π/4)
+
+    @testset "Normal covariance factor" begin
+        semidefinite = [0.5 0.5; 0.5 0.5]
+        nearzero = Diagonal([-eps(Float64),eps(Float64)])
+        strongly_squeezed = SqueezedThermal(0,3cis(0.7),0).V-I/2
+        for C in (vacuum.V-I/2,semidefinite,nearzero,strongly_squeezed)
+            L = QuantumPhaseSpace._normal_covfactor(C)
+            @test L*transpose(L) ≈ C
+        end
+        @test !iszero(imag(QuantumPhaseSpace._normal_covfactor(nearzero)[1,1]))
+    end
+
+    @testset "Layouts, RNG and classical limits" begin
+        @test all(isempty,positiveP(rng,vacuum,0;method=:drummond))
+        @test map(length,positiveP(rng,legacy,0;method=:drummond)) == (0,0,0,0)
+        @test map(size,positiveP(rng,Gaussian(legacy),0;method=:drummond)) == ((2,0),(2,0))
+        @test_throws ArgumentError positiveP(rng,vacuum,-1;method=:drummond)
+        @test_throws ArgumentError positiveP(rng,legacy,1;method=:unknown)
+        for s in (legacy,Gaussian(legacy),Squeezed(0.2,0.4im),Bogoliubov(sqrt(2),cis(0.5),0.2))
+            @test positiveP(MersenneTwister(1),s,16;method=:drummond) ==
+                  positiveP(MersenneTwister(1),s,16;method=:drummond)
+            @test positiveP(MersenneTwister(2),s,16;method=:canonical) ==
+                  positiveP(MersenneTwister(2),s,16)
+        end
+        for s in (vacuum,Gaussian(Coherent(0.2+0.3im)))
+            α,αp = positiveP(s,16;method=:drummond)
+            @test α == fill(only(s.β),16)
+            @test αp == conj.(α)
+        end
+        α,αp = positiveP(rng,thermal,N;method=:drummond)
+        @test αp == conj.(α)
+        n = abs2.(α.-only(thermal.β))
+        checkmean(n,1.3)
+        checkmean(n.^2,2*1.3^2)
+    end
+
+    @testset "Displaced single-mode squeezing" begin
+        for (r,θ,β) in ((0.15,0.0,0.0),(0.8,π/3,0.6+0.2im),(2.0,-π/2,-0.4im))
+            a,ap = positiveP(rng,Squeezed(β,r*cis(θ)),N;method=:drummond)
+            n = sinh(r)^2
+            m = -cis(θ)*sinh(r)*cosh(r)
+            checkmean(a,β)
+            checkmean(ap,conj(β))
+            checkmean(ap.*a,n+abs2(β))
+            checkmean(a.^2,m+β^2)
+            checkmean((ap.*a).^2,2n^2+abs2(m)+4n*abs2(β)+2real(conj(β)^2*m)+abs2(β)^2)
+        end
+    end
+
+    @testset "Two-mode squeezing" begin
+        for (r,ϕ) in ((0.4,0.0),(0.8,π/4),(2.0,π/2))
+            a,ap,b,bp = positiveP(rng,SqueezedTwoMode(r,ϕ),N;method=:drummond)
+            n = sinh(r)^2
+            m = cis(2ϕ)*sinh(r)*cosh(r)
+            na,nb = ap.*a,bp.*b
+            checkmean(na,n)
+            checkmean(nb,n)
+            checkmean(a.*b,m)
+            checkmean(na.^2,2n^2)
+            checkmean(na.*nb,n^2+abs2(m))
+            checkmean((a.*b).^2,2m^2)
+            for (α,αp) in ((a,ap),(b,bp))
+                checkmean(abs2.(α.-conj.(αp)),-expm1(-2r))
+            end
+        end
+
+        r,d = 0.65,1.4
+        g = Gaussian(fill(d,2),TwoModeSqueezedThermal(r,0).V)
+        a,ap = positiveP(rng,g,N;method=:drummond)
+        na,nb = ap[1,:].*a[1,:],ap[2,:].*a[2,:]
+        Δ = na.-nb
+        # The mean difference is zero. Restore the commutator in (n₁−n₂)².
+        checkmean(Δ,0)
+        checkmean(Δ.^2 .+ na .+ nb,2d^2*exp(-2r))
+    end
+
+    @testset "Correlated multimode squeezing" begin
+        M = 3
+        mix = [cis(2π*j*k/M)/sqrt(M) for j in 0:M-1,k in 0:M-1]
+        r = [0.2,0.65,0.85]
+        θ = [0.1,-0.8,1.1]
+        nthermal = [0.0,0.3,0.15]
+        β = [0.25im,-0.4,0.3-0.2im]
+        U = mix*Diagonal(cosh.(r))
+        V = conj.(mix*Diagonal(-cis.(θ).*sinh.(r)))
+        g = GaussianBogoliubov(U,V,nthermal;β)
+        A,B = positiveP(rng,g,N;method=:drummond)
+        @test size(A) == size(B) == (M,N)
+
+        n = nthermal.+(2nthermal.+1).*sinh.(r).^2
+        m = -(2nthermal.+1).*cis.(θ).*sinh.(r).*cosh.(r)
+        normal = conj.(mix)*Diagonal(n)*transpose(mix)
+        anomalous = mix*Diagonal(m)*transpose(mix)
+        for i in 1:M
+            checkmean(A[i,:],β[i])
+            checkmean(B[i,:],conj(β[i]))
+        end
+        A .-= β
+        B .-= conj.(β)
+        for i in 1:M,j in 1:M
+            checkmean(B[i,:].*A[j,:],normal[i,j])
+            checkmean(A[i,:].*A[j,:],anomalous[i,j])
+            checkmean(B[i,:].*B[j,:],conj(anomalous[i,j]))
+        end
+        checkmean(B[1,:].*B[2,:].*A[1,:].*A[2,:],
+                  normal[1,1]*normal[2,2]+abs2(normal[1,2])+abs2(anomalous[1,2]))
+        checkmean(A[1,:].^3 .* A[3,:],3anomalous[1,1]*anomalous[1,3])
+    end
+end

@@ -228,8 +228,7 @@ public calls; tests compare their conventions to the general covariance model.
 `SqueezedThermal` follows the single-mode negative anomalous-moment convention.
 `TwoModeSqueezedThermal` retains the legacy `SqueezedTwoMode(r,ϕ)` convention
 `⟨a₁a₂⟩=exp(2iϕ)sinh(r)cosh(r)` for vacuum input. `GaussianBogoliubov` uses
-`a=U*b+conj(V)*b†` and checks both canonical identities. Every Gaussian state
-has Q-derived positive-P; ordinary P rejects nonclassical covariances.
+`a=U*b+conj(V)*b†` and checks both canonical identities.
 
 For `PhotonAddedGaussian` the state must be centred and single mode. Diagonalise
 its quadrature Q covariance with principal variances v₁,v₂. Expanding
@@ -251,6 +250,79 @@ TwoModeSqueezedThermal
 GaussianBogoliubov
 PhotonAddedGaussian
 ```
+
+## [Direct Gaussian positive-P sampling](@id direct-gaussian-positive-p)
+
+```julia
+using QuantumPhaseSpace, Random
+rng = Xoshiro(42)
+state = SqueezedTwoMode(2.0, 0.0)
+a, ap, b, bp = positiveP(rng, state, 100_000; method=:drummond)
+ac, acp, bc, bcp = positiveP(Xoshiro(42), state, 100_000; method=:canonical)
+```
+
+`Gaussian`, `Squeezed`, `SqueezedTwoMode` and `Bogoliubov` support
+`method=:drummond`. Their default `method=:canonical` draws a Husimi-Q sample
+`μ` and independent unit circular Gaussian noise `γ`, returning
+`(μ+γ, conj(μ-γ))` for each mode. The dedicated `Coherent` and `Thermal`
+samplers already produce conjugate pairs.
+
+The direct sampler diagonalises the real symmetric normally ordered
+covariance `C = V-I/2 = O*Diagonal(λ)*transpose(O)` once per batch. Let
+`L = O*Diagonal(sqrt.(complex.(λ)))`, so `L*transpose(L) = C`. Each trajectory
+draws independent standard real normals `ξ` and sets `z = R̄+L*ξ`, with
+`R̄ = (√2 Re β₁, √2 Im β₁, …)`. It then forms the doubled pair
+`αⱼ = (zₓ+i zₚ)/√2`, `αⱼ⁺ = (zₓ-i zₚ)/√2`.
+The same complex quadratures enter both coordinates. Negative eigenvalues
+yield purely imaginary noise, and zero eigenvalues yield zero noise. A
+squeezed quadrature with negative normally ordered variance precludes a
+nonnegative ordinary Glauber P. The real Gaussian draws still define an
+unweighted positive-P law on the doubled space. Its Gaussian moment-generating
+function reproduces all normally ordered moments in the ensemble limit,
+including `⟨ab⟩ = cis(2ϕ)*sinh(r)*cosh(r)` for the state above.
+
+The total mean-square nonconjugacy `Σⱼ E|αⱼ-conj(αⱼ⁺)|²` equals
+`2 E‖Im(z)‖²`. For any unweighted sampler with the same second moments, the
+variance of the imaginary quadratures projected onto the negative eigenspace
+of `C` must at least compensate the negative eigenvalues there. The direct
+factor attains the lower bound `2 Σₖ max(-λₖ,0)`. For two-mode squeezed
+vacuum, this gives `1-exp(-2r)` per mode, compared with `4` for canonical
+conversion.
+
+### Two-mode squeezed vacuum comparison
+
+The table compares the two `QuantumPhaseSpace.jl` samplers at phase zero
+with 200,000 trajectories each. The last three columns are standard errors
+of the **real** parts of the physical estimators.
+
+| Squeezing r | Method | Nonconjugacy per mode | SE of ⟨n₁⟩ | SE of ⟨ab⟩ | SE of Var(n₁−n₂) |
+| ---: | --- | ---: | ---: | ---: | ---: |
+| 0.5 | Canonical | 4.00 | 0.00362 | 0.00372 | 0.0274 |
+| 0.5 | Drummond | 0.634 | 0.00102 | 0.00131 | 0.00292 |
+| 2.0 | Canonical | 4.00 | 0.0319 | 0.0324 | 0.282 |
+| 2.0 | Drummond | 0.984 | 0.0299 | 0.0305 | 0.117 |
+
+At r=2 the direct sampler cut the variance of the real number-difference
+estimator by a factor of 5.8 and reduced its imaginary standard error from
+0.258 to roundoff. The real occupation estimator variance fell by 12%.
+
+The number-difference variance uses the trajectory estimator
+`(n₁-n₂)^2+n₁+n₂` for its second moment, where `nⱼ=αⱼ⁺*αⱼ`.
+The linear terms restore the commutator. Subtract the squared mean difference
+if it is nonzero. In a two-mode squeezed vacuum the exact variance is zero,
+and the estimator can still have a substantial standard error at strong
+squeezing. The direct sampler reduces initial spreading, while estimator
+variance depends on the observable and stability of subsequent nonlinear
+positive-P evolution depends on the dynamics. The implementation uses
+Float64 covariance data, so extreme squeezing can lose the small quadrature
+variance at the scale of covariance roundoff.
+
+- Drummond and Opanchuk, *Initial states for quantum field simulations in phase
+  space*, Phys. Rev. Research **2**, 033304 (2020).
+  [DOI](https://doi.org/10.1103/PhysRevResearch.2.033304)
+- Drummond, Opanchuk, Dellios and Reid, *Simulating complex networks in phase
+  space: Gaussian boson sampling*, Phys. Rev. A **105**, 012427 (2022).
+  [DOI](https://doi.org/10.1103/PhysRevA.105.012427)
 
 ## [Doubled positive-W sampling](@id positive-w-sampling)
 
