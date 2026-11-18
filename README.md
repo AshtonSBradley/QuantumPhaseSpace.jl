@@ -9,6 +9,8 @@ Sample initial states for bosonic and fermionic quantum phase-space simulations.
 The bosonic samplers cover quantum optics and Bose fields. The fermionic samplers
 provide initial bilinear ensembles for truncated Wigner calculations.
 
+<img src="examples/fock.png" alt="Fock state Wigner function" width="300"/>
+
 QuantumPhaseSpace.jl succeeds [PhaseSpaceTools.jl](https://github.com/AshtonSBradley/PhaseSpaceTools.jl).
 See the [documentation](docs/src/index.md) for usage and representation conventions.
 
@@ -73,8 +75,6 @@ a,a⁺ = positiveP(s,N)
 This is a special case where the two phase space variables `a` and `a⁺` are complex conjugate, and non-stochastic in the `+P` representation.
 
 ### Fock state
-
-<img src="examples/fock.png" alt="Fock state Wigner function" width="300"/>
 
 An approximate Fock state sampler in the Wigner representation:
 ```julia
