@@ -4,7 +4,6 @@
 [![Build Status](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/CI.yml)
 [![Aqua](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml/badge.svg?branch=master)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml)
 [![Coverage](https://codecov.io/gh/AshtonSBradley/QuantumPhaseSpace.jl/branch/master/graph/badge.svg)](https://app.codecov.io/gh/AshtonSBradley/QuantumPhaseSpace.jl)
-[![PhaseSpaceTools DOI](https://img.shields.io/badge/legacy%20DOI-10.5281%2Fzenodo.3758700-blue)](https://doi.org/10.5281/zenodo.3758700)
 
 Sample initial states for bosonic and fermionic quantum phase-space simulations.
 The bosonic samplers cover quantum optics and Bose fields. The fermionic samplers
