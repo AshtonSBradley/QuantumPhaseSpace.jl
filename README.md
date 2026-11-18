@@ -1,7 +1,10 @@
 # QuantumPhaseSpace
 
-[![Build Status](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/workflows/CI/badge.svg)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions)
-[![Aqua](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml/badge.svg)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/)
+[![Build Status](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/CI.yml)
+[![Aqua](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml/badge.svg?branch=master)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml)
+[![Coverage](https://codecov.io/gh/AshtonSBradley/QuantumPhaseSpace.jl/branch/master/graph/badge.svg)](https://app.codecov.io/gh/AshtonSBradley/QuantumPhaseSpace.jl)
+[![PhaseSpaceTools DOI](https://img.shields.io/badge/legacy%20DOI-10.5281%2Fzenodo.3758700-blue)](https://doi.org/10.5281/zenodo.3758700)
 
 Sample initial states for bosonic and fermionic quantum phase-space simulations.
 The bosonic samplers cover quantum optics and Bose fields. The fermionic samplers
@@ -71,6 +74,9 @@ a,a⁺ = positiveP(s,N)
 This is a special case where the two phase space variables `a` and `a⁺` are complex conjugate, and non-stochastic in the `+P` representation.
 
 ### Fock state
+
+<img src="examples/fock.png" alt="Fock state Wigner function" width="300"/>
+
 An approximate Fock state sampler in the Wigner representation:
 ```julia
 n = 100
@@ -106,9 +112,10 @@ covariance by two before using `Gaussian`.
 Development evidence and outstanding limitations are recorded in
 [`dev/PROGRESS.md`](dev/PROGRESS.md).
 
-# External links
-___Numerical representation of quantum states in the positive-P and Wigner representations,___ \
-M K Olsen, A S Bradley, \
-[Optics Communications 282, 3924 (2009)](http://dx.doi.org/10.1016/j.optcom.2009.06.033)
+## References
 
-[Scipost Commentary with full erratum](https://scipost.org/commentaries/10.1016/j.optcom.2009.06.033/)
+- M. K. Olsen and A. S. Bradley, [Numerical representation of quantum states in the positive-P and Wigner representations](https://doi.org/10.1016/j.optcom.2009.06.033), *Optics Communications* **282**, 3924–3929 (2009). See the [2016 thermal-state erratum](https://doi.org/10.1016/j.optcom.2016.02.068) and the [SciPost commentary](https://scipost.org/commentaries/10.1016/j.optcom.2009.06.033/) for corrections to the original prescriptions.
+- P. D. Drummond and C. W. Gardiner, [Generalised P-representations in quantum optics](https://doi.org/10.1088/0305-4470/13/7/018), *J. Phys. A* **13**, 2353–2368 (1980). This gives the canonical positive-P construction used with the package's Husimi-Q samplers.
+- P. D. Drummond and B. Opanchuk, [Initial states for quantum field simulations in phase space](https://doi.org/10.1103/PhysRevResearch.2.033304), *Phys. Rev. Research* **2**, 033304 (2020), and P. D. Drummond et al., [Simulating complex networks in phase space: Gaussian boson sampling](https://doi.org/10.1103/PhysRevA.105.012427), *Phys. Rev. A* **105**, 012427 (2022). These provide the context for direct Gaussian positive-P sampling.
+- L. I. Plimak et al., [Beyond the Fokker–Planck equation: Stochastic simulation of complete Wigner representation for the optical parametric oscillator](https://doi.org/10.1209/epl/i2001-00529-8), *Europhys. Lett.* **56**, 372–378 (2001). This develops the doubled positive-W representation.
+- S. M. Davidson, D. Sels and A. Polkovnikov, [Semiclassical approach to dynamics of interacting fermions](https://doi.org/10.1016/j.aop.2017.07.003), *Ann. Phys.* **384**, 128–141 (2017). This gives the fermionic truncated-Wigner framework used by the bilinear initializers.
