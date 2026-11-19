@@ -25,7 +25,7 @@ determinants and free thermal states.
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/AshtonSBradley/QuantumPhaseSpace.jl")
+Pkg.add("QuantumPhaseSpace")
 ```
 
 # References

@@ -27,7 +27,7 @@ components at ±α. [Explore the cat-state Q tutorial](https://ashtonsbradley.gi
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/AshtonSBradley/QuantumPhaseSpace.jl")
+Pkg.add("QuantumPhaseSpace")
 ```
 
 ## Quick Start
