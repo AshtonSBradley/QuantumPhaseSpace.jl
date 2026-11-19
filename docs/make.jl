@@ -16,3 +16,9 @@ pages = [
 format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true")
 )
+
+deploydocs(
+    repo = "github.com/AshtonSBradley/QuantumPhaseSpace.jl.git",
+    devbranch = "master",
+    versions = ["stable" => "v^", "v#.#", "dev" => "dev"],
+)

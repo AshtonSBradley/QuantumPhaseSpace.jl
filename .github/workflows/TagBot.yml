@@ -10,7 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
+      - name: Record existing release tags
+        run: gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/v" --jq '[.[].ref]' > "$RUNNER_TEMP/tags-before.json"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: JuliaRegistries/TagBot@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      # Tags created with GITHUB_TOKEN need an explicit workflow dispatch.
+      - name: Build documentation for new release tags
+        shell: python
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          before = set(json.loads((Path(os.environ["RUNNER_TEMP"]) / "tags-before.json").read_text()))
+          response = subprocess.check_output(["gh", "api", f"repos/{repo}/git/matching-refs/tags/v"], text=True)
+          after = {tag["ref"] for tag in json.loads(response)}
+          for ref in sorted(after - before):
+              tag = ref.removeprefix("refs/tags/")
+              subprocess.run(["gh", "workflow", "run", "CI.yml", "--repo", repo, "--ref", tag], check=True)

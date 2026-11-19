@@ -1,6 +1,6 @@
 # QuantumPhaseSpace
 
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/)
 [![Build Status](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/CI.yml)
 [![Aqua](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml/badge.svg?branch=master)](https://github.com/AshtonSBradley/QuantumPhaseSpace.jl/actions/workflows/Aqua.yml)
 [![Coverage](https://codecov.io/gh/AshtonSBradley/QuantumPhaseSpace.jl/branch/master/graph/badge.svg)](https://app.codecov.io/gh/AshtonSBradley/QuantumPhaseSpace.jl)
@@ -12,16 +12,16 @@ provide initial bilinear ensembles for truncated Wigner calculations.
 <img src="examples/fock.png" alt="Fock state Wigner function" width="300"/>
 
 QuantumPhaseSpace.jl succeeds [PhaseSpaceTools.jl](https://github.com/AshtonSBradley/PhaseSpaceTools.jl).
-See the [documentation](docs/src/index.md) for usage and representation conventions.
+See the [documentation](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/) for usage and representation conventions.
 
 Exact Husimi-Q and positive-P sampling includes cats, finite quantum superpositions, photon-added states and multimode initial conditions. Ordinary Wigner sampling is available for the states listed in the support table.
 
 Available distributions are `glauberP`, `positiveP`, `wigner`, `positiveW`, and `husimiQ`.
 
-[![Even-cat, odd-cat and classical-mixture Husimi-Q samples, with coherent centres at plus and minus alpha.](docs/src/assets/cat-q.png)](docs/src/cat-q.md)
+[![Even-cat, odd-cat and classical-mixture Husimi-Q samples, with coherent centres at plus and minus alpha.](docs/src/assets/cat-q.png)](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/cat-q/)
 
 Even and odd cats preserve different interference between the same coherent
-components at ±α. [Explore the cat-state Q tutorial](docs/src/cat-q.md).
+components at ±α. [Explore the cat-state Q tutorial](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/cat-q/).
 
 ## Install
 
@@ -44,7 +44,7 @@ z, zbar = husimiQ(rng, state, 100_000)
 `z` contains Q phase-plane samples and `zbar == conj.(z)`. Use `OddCat(α)` for
 the relative minus sign. The classical mixture is
 `Mixture((Coherent(α),Coherent(-α)),[0.5,0.5])`. The
-[tutorial](docs/src/cat-q.md) compares all three distributions and explains
+[tutorial](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/cat-q/) compares all three distributions and explains
 `sampleQ(...; diagnostics=true)`, ordering corrections and preparation loss.
 
 ## Core states
@@ -61,7 +61,7 @@ Exact Q extensions include cats and finite coherent/Fock superpositions, NOON
 states, photon-added and photon-subtracted families, passive multimode states,
 fixed-number condensates, Gaussian covariance states, and loss/phase-diffusion
 channels. All inherit exact positive-P sampling. See the
-[state × representation table](docs/src/support.md) for the full API and its
+[state × representation table](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/support/) for the full API and its
 exact/approximate/unsupported distinctions.
 
 ### Coherent state
@@ -97,12 +97,12 @@ legacy two-mode four-vector interfaces remain available.
   collapse and revival times using finite Fock superpositions.
 - [Canonical thermal states](examples/canonical_thermal.jl) sample Gibbs
   mixtures for Kerr, harmonic and displaced harmonic oscillators.
-- The [worked Fock-basis examples](docs/src/fock-basis.md) explain the
+- The [worked Fock-basis examples](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/fock-basis/) explain the
   estimators and checks used in these examples.
-- [Fermionic truncated Wigner](docs/src/fermions.md) initializes bilinear
+- [Fermionic truncated Wigner](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/fermions/) initializes bilinear
   trajectories for Slater determinants and free thermal fermions.
 
-The [support table](docs/src/support.md) distinguishes exact laws, explicit
+The [support table](https://ashtonsbradley.github.io/QuantumPhaseSpace.jl/dev/support/) distinguishes exact laws, explicit
 approximations and unsupported methods. Positive-W is a doubled representation,
 with generally correlated nonconjugate coordinates, and is not ordinary W.
 Gaussian covariances use `[x,p]=i` and vacuum `I/2`; divide an `[X,Y]=2i`
